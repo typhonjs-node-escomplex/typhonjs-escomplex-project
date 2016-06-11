@@ -1,0 +1,13 @@
+{
+  "presets": ["es2015"],
+  "plugins":
+  [
+    "add-module-exports",
+    ["module-alias",
+      [
+        { "src": "npm:escomplex-plugin-metrics-project/dist", "expose": "escomplex-plugin-metrics-project/src" },
+        { "src": "npm:typhonjs-escomplex-module/dist", "expose": "typhonjs-escomplex-module/src" }
+      ]
+    ]
+  ]
+}

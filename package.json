@@ -1,0 +1,58 @@
+{
+  "name": "typhonjs-escomplex-project",
+  "version": "0.0.1",
+  "description": "Provides project oriented AST processing for typhonjs-escomplex complexity reports.",
+  "homepage": "https://github.com/typhonjs-node-escomplex/typhonjs-escomplex-module",
+  "bugs": "https://github.com/typhonjs-node-escomplex/typhonjs-escomplex-project/issues",
+  "license": "MPL-2.0",
+  "author": {
+    "name": "Mike Leahy"
+  },
+  "main": "./dist",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/typhonjs-node-escomplex/typhonjs-escomplex-project.git"
+  },
+  "maintainers": [
+    {
+      "name": "Mike Leahy",
+      "email": "support@typhonjs.io",
+      "url": "https://github.com/typhonrt"
+    }
+  ],
+  "dependencies": {
+    "typhonjs-escomplex-module": "git+https://git@github.com/typhonjs-node-plugin/typhonjs-escomplex-module.git",
+    "typhonjs-plugin-manager": "git+https://git@github.com/typhonjs-node-plugin/typhonjs-plugin-manager.git"
+  },
+  "devDependencies": {
+    "acorn": "^3.0.0",
+    "babylon": "^6.0.0",
+    "espree": "^3.0.0",
+    "esprima": "^2.0.0",
+    "typhonjs-config-eslint": "^0.4.0",
+    "typhonjs-npm-build-test": "^0.3.0"
+  },
+  "scripts": {
+    "build": "babel-node ./node_modules/typhonjs-npm-scripts-build-babel/scripts/build.js",
+    "esdoc": "esdoc -c .esdocrc",
+    "eslint": "eslint .",
+    "prepublish": "babel-node ./node_modules/typhonjs-npm-scripts-publish/scripts/prepublish.js",
+    "test": "babel-node ./node_modules/typhonjs-npm-scripts-test-mocha/scripts/mocha.js",
+    "test-coverage": "babel-node ./node_modules/typhonjs-npm-scripts-test-mocha/scripts/mocha-istanbul.js"
+  },
+  "keywords": [
+    "typhonjs",
+    "escomplex",
+    "complexity",
+    "simplicity",
+    "cyclomatic",
+    "halstead",
+    "maintainability",
+    "dependencies",
+    "static",
+    "analysis",
+    "metrics",
+    "es6",
+    "es7"
+  ]
+}
