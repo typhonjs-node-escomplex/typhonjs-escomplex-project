@@ -4,33 +4,70 @@ Object.defineProperty(exports, "__esModule", {
    value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _path = require('path');
+var _ESComplexModule = require('typhonjs-escomplex-module/dist/ESComplexModule.js');
 
-var _path2 = _interopRequireDefault(_path);
+var _ESComplexModule2 = _interopRequireDefault(_ESComplexModule);
 
-var _typhonjsEscomplexModule = require('typhonjs-escomplex-module');
+var _Plugins = require('./Plugins.js');
 
-var _typhonjsEscomplexModule2 = _interopRequireDefault(_typhonjsEscomplexModule);
+var _Plugins2 = _interopRequireDefault(_Plugins);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ESComplexProject = function () {
+   /**
+    * Initializes ESComplexProject
+    *
+    * @param {object}   options - module options
+    */
+
    function ESComplexProject() {
+      var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
       _classCallCheck(this, ESComplexProject);
+
+      if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object') {
+         throw new TypeError('ctor error: `options` is not an `object`.');
+      }
+
+      this._plugins = new _Plugins2.default(options);
+
+      this._moduleAnalyser = new _ESComplexModule2.default(options);
    }
+
+   /**
+    * Processes the given modules and calculates metrics via plugins.
+    *
+    * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
+    * @param {object}   options - project processing options
+    *
+    * @returns {Promise}
+    */
+
 
    _createClass(ESComplexProject, [{
       key: 'analyze',
-      value: function analyze(modules, options) {
-         options = options || {};
+      value: function analyze(modules) {
+         var _this = this;
+
+         var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
          if (!Array.isArray(modules)) {
             throw new TypeError('Invalid modules');
          }
+         if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object') {
+            throw new TypeError('analyze error: `options` is not an `object`.');
+         }
+
+         var settings = this._plugins.onConfigure(options);
+
+         this._plugins.onProjectStart(settings);
 
          var reports = modules.map(function (m) {
             var report = void 0;
@@ -40,10 +77,8 @@ var ESComplexProject = function () {
             }
 
             try {
-               report = _typhonjsEscomplexModule2.default.analyze(m.ast, options);
-
+               report = _this._moduleAnalyser.analyze(m.ast, options);
                report.path = m.path;
-
                return report;
             } catch (error) {
                // These error messages are useless unless they contain the module path.
@@ -52,292 +87,93 @@ var ESComplexProject = function () {
             }
          }, []);
 
+         var results = { reports: reports };
+
          if (options.skipCalculation) {
-            return { reports: reports };
+            return results;
          }
 
-         return this.processResults({ reports: reports }, options.noCoreSize);
+         this._plugins.onProjectEnd(results);
+
+         return results;
       }
+
+      /**
+       * Wraps in a Promise processing the given modules and calculates metrics via plugins.
+       *
+       * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
+       * @param {object}   options - project processing options
+       *
+       * @returns {Promise}
+       */
+
    }, {
-      key: 'processResults',
-      value: function processResults(result, noCoreSize) {
-         this.createAdjacencyMatrix(result);
-         if (!noCoreSize) {
-            this.createVisibilityMatrix(result);
-            this.setCoreSize(result);
-         }
-
-         this.calculateAverages(result);
-
-         return result;
-      }
-   }, {
-      key: 'createAdjacencyMatrix',
-      value: function createAdjacencyMatrix(result) {
-         var _this = this;
-
-         var adjacencyMatrix = new Array(result.reports.length);
-         var density = 0;
-
-         result.reports.sort(function (lhs, rhs) {
-            return _this.comparePaths(lhs.path, rhs.path);
-         }).forEach(function (ignore, x) {
-            adjacencyMatrix[x] = new Array(result.reports.length);
-            result.reports.forEach(function (ignore, y) {
-               adjacencyMatrix[x][y] = _this.getAdjacencyMatrixValue(result.reports, x, y);
-               if (adjacencyMatrix[x][y] === 1) {
-                  density += 1;
-               }
-            });
-         });
-
-         result.adjacencyMatrix = adjacencyMatrix;
-         result.firstOrderDensity = this.percentifyDensity(density, adjacencyMatrix);
-      }
-   }, {
-      key: 'comparePaths',
-      value: function comparePaths(lhs, rhs) {
-         var lsplit = lhs.split(_path2.default.sep);
-         var rsplit = rhs.split(_path2.default.sep);
-
-         if (lsplit.length < rsplit.length || lsplit.length === rsplit.length && lhs < rhs) {
-            return -1;
-         }
-
-         if (lsplit.length > rsplit.length || lsplit.length === rsplit.length && lhs > rhs) {
-            return 1;
-         }
-
-         return 0;
-      }
-   }, {
-      key: 'getAdjacencyMatrixValue',
-      value: function getAdjacencyMatrixValue(reports, x, y) {
-         if (x === y) {
-            return 0;
-         }
-
-         if (this.doesDependencyExist(reports[x], reports[y])) {
-            return 1;
-         }
-
-         return 0;
-      }
-   }, {
-      key: 'doesDependencyExist',
-      value: function doesDependencyExist(from, to) {
+      key: 'analyzeThen',
+      value: function analyzeThen(modules) {
          var _this2 = this;
 
-         return from.dependencies.reduce(function (result, dependency) {
-            if (result === false) {
-               return _this2.checkDependency(from.path, dependency, to.path);
-            }
+         var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-            return true;
-         }, false);
-      }
-   }, {
-      key: 'checkDependency',
-      value: function checkDependency(from, dependency, to) {
-         if (this.isCommonJSDependency(dependency)) {
-            if (this.isInternalCommonJSDependency(dependency)) {
-               return this.isDependency(from, dependency, to);
-            }
-
-            return false;
-         }
-
-         return this.isDependency(from, dependency, to);
-      }
-   }, {
-      key: 'isCommonJSDependency',
-      value: function isCommonJSDependency(dependency) {
-         return dependency.type === 'cjs';
-      }
-   }, {
-      key: 'isInternalCommonJSDependency',
-      value: function isInternalCommonJSDependency(dependency) {
-         return dependency.path[0] === '.' && (dependency.path[1] === _path2.default.sep || dependency.path[1] === '.' && dependency.path[2] === _path2.default.sep);
-      }
-   }, {
-      key: 'isDependency',
-      value: function isDependency(from, dependency, to) {
-         var dependencyPath = dependency.path;
-
-         if (_path2.default.extname(dependencyPath) === '') {
-            dependencyPath += _path2.default.extname(to);
-         }
-
-         return _path2.default.resolve(_path2.default.dirname(from), dependencyPath) === to;
-      }
-   }, {
-      key: 'percentifyDensity',
-      value: function percentifyDensity(density, matrix) {
-         return this.percentify(density, matrix.length * matrix.length);
-      }
-   }, {
-      key: 'percentify',
-      value: function percentify(value, limit) {
-         if (limit === 0) {
-            return 0;
-         }
-
-         return value / limit * 100;
-      }
-
-      // implementation of floydWarshall alg for calculating visibility matrix in O(n^3) instead of O(n^4) with successive
-      // raising of powers
-
-   }, {
-      key: 'createVisibilityMatrix',
-      value: function createVisibilityMatrix(result) {
-         var changeCost = 0,
-             i = void 0,
-             j = void 0,
-             k = void 0,
-             visibilityMatrix = void 0;
-
-         visibilityMatrix = this.adjacencyToDistMatrix(result.adjacencyMatrix);
-         var matrixLen = visibilityMatrix.length;
-
-         for (k = 0; k < matrixLen; k += 1) {
-            for (i = 0; i < matrixLen; i += 1) {
-               for (j = 0; j < matrixLen; j += 1) {
-                  if (visibilityMatrix[i][j] > visibilityMatrix[i][k] + visibilityMatrix[k][j]) {
-                     visibilityMatrix[i][j] = visibilityMatrix[i][k] + visibilityMatrix[k][j];
-                  }
-               }
-            }
-         }
-
-         // convert back from a distance matrix to adjacency matrix, while also calculating change cost
-         visibilityMatrix = visibilityMatrix.map(function (row, rowIndex) {
-            return row.map(function (value, columnIndex) {
-               if (value < Infinity) {
-                  changeCost += 1;
-
-                  if (columnIndex !== rowIndex) {
-                     return 1;
-                  }
-               }
-
-               return 0;
-            });
-         });
-
-         result.visibilityMatrix = visibilityMatrix;
-         result.changeCost = this.percentifyDensity(changeCost, visibilityMatrix);
-      }
-   }, {
-      key: 'adjacencyToDistMatrix',
-      value: function adjacencyToDistMatrix(matrix) {
-         var distMatrix = [];
-         var i = void 0,
-             j = void 0,
-             value = void 0;
-         for (i = 0; i < matrix.length; i += 1) {
-            distMatrix.push([]);
-            for (j = 0; j < matrix[i].length; j += 1) {
-               value = null;
-               if (i === j) {
-                  value = 1;
-               } else {
-                  // where we have 0, set distance to Infinity
-                  value = matrix[i][j] || Infinity;
-               }
-               distMatrix[i][j] = value;
-            }
-         }
-         return distMatrix;
-      }
-   }, {
-      key: 'setCoreSize',
-      value: function setCoreSize(result) {
-         if (result.firstOrderDensity === 0) {
-            result.coreSize = 0;
-            return;
-         }
-
-         var fanIn = new Array(result.visibilityMatrix.length);
-         var fanOut = new Array(result.visibilityMatrix.length);
-         var boundaries = {};
-         var coreSize = 0;
-
-         result.visibilityMatrix.forEach(function (row, rowIndex) {
-            fanIn[rowIndex] = row.reduce(function (sum, value, valueIndex) {
-               if (rowIndex === 0) {
-                  fanOut[valueIndex] = value;
-               } else {
-                  fanOut[valueIndex] += value;
-               }
-
-               return sum + value;
-            }, 0);
-         });
-
-         // Boundary values can also be chosen by looking for discontinuity in the
-         // distribution of values, but I've chosen the median to keep it simple.
-         boundaries.fanIn = this.getMedian(fanIn.slice());
-         boundaries.fanOut = this.getMedian(fanOut.slice());
-
-         result.visibilityMatrix.forEach(function (ignore, index) {
-            if (fanIn[index] >= boundaries.fanIn && fanOut[index] >= boundaries.fanOut) {
-               coreSize += 1;
+         return new Promise(function (resolve, reject) {
+            try {
+               resolve(_this2.analyze(modules, options));
+            } catch (err) {
+               reject(err);
             }
          });
-
-         result.coreSize = this.percentify(coreSize, result.visibilityMatrix.length);
       }
-   }, {
-      key: 'getMedian',
-      value: function getMedian(values) {
-         values.sort(this.compareNumbers);
 
-         // Checks of values.length is odd.
-         if (values.length % 2) {
-            return values[(values.length - 1) / 2];
+      /**
+       * Processes the an existing project report and calculates metrics via plugins.
+       *
+       * @param {Array}    reports - An object hash with a `reports` entry that is an Array of module results.
+       * @param {object}   options - project processing options
+       *
+       * @returns {Promise}
+       */
+
+   }, {
+      key: 'processResults',
+      value: function processResults(reports) {
+         var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+         if ((typeof reports === 'undefined' ? 'undefined' : _typeof(reports)) !== 'object') {
+            throw new TypeError('Invalid reports');
+         }
+         if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object') {
+            throw new TypeError('processResults error: `options` is not an `object`.');
          }
 
-         return (values[(values.length - 2) / 2] + values[values.length / 2]) / 2;
+         var settings = this._plugins.onConfigure(options);
+
+         this._plugins.onProjectStart(settings);
+         this._plugins.onProjectEnd(reports);
+
+         return reports;
       }
+
+      /**
+       * Wraps in a Promise processing an existing project report and calculates metrics via plugins.
+       *
+       * @param {Array}    reports - An object hash with a `reports` entry that is an Array of module results.
+       * @param {object}   options - project processing options
+       *
+       * @returns {Promise}
+       */
+
    }, {
-      key: 'compareNumbers',
-      value: function compareNumbers(lhs, rhs) {
-         if (lhs < rhs) {
-            return -1;
-         }
-         if (lhs > rhs) {
-            return 1;
-         }
-         return 0;
-      }
-   }, {
-      key: 'calculateAverages',
-      value: function calculateAverages(result) {
-         var divisor = void 0;
+      key: 'processResultsThen',
+      value: function processResultsThen(reports) {
+         var _this3 = this;
 
-         var sums = {
-            loc: 0,
-            cyclomatic: 0,
-            effort: 0,
-            params: 0,
-            maintainability: 0
-         };
+         var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-         if (result.reports.length === 0) {
-            divisor = 1;
-         } else {
-            divisor = result.reports.length;
-         }
-
-         result.reports.forEach(function (report) {
-            Object.keys(sums).forEach(function (key) {
-               sums[key] += report[key];
-            });
-         });
-
-         Object.keys(sums).forEach(function (key) {
-            result[key] = sums[key] / divisor;
+         return new Promise(function (resolve, reject) {
+            try {
+               resolve(_this3.processResults(reports, options));
+            } catch (err) {
+               reject(err);
+            }
          });
       }
    }]);

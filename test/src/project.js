@@ -556,7 +556,7 @@ if (testconfig.modules['project'])
 
                test('should be able to run processResults without calculating coreSize', () =>
                {
-                  const results = cr.processResults(reportsOnly, true);
+                  const results = cr.processResults(reportsOnly, { noCoreSize: true });
                   assert.notOk(results.coreSize);
                   assert.notOk(results.visibilityMatrix);
                   // make sure we still have a few things though

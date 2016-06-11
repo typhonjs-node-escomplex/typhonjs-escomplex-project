@@ -1,15 +1,41 @@
 'use strict';
 
-import path             from 'path';
-import moduleAnalyser   from 'typhonjs-escomplex-module';
+import ESComplexModule  from 'typhonjs-escomplex-module/src/ESComplexModule.js';
+
+import Plugins          from './Plugins.js';
 
 export default class ESComplexProject
 {
-   analyze(modules, options)
+   /**
+    * Initializes ESComplexProject
+    *
+    * @param {object}   options - module options
+    */
+   constructor(options = {})
    {
-      options = options || {};
+      if (typeof options !== 'object') { throw new TypeError('ctor error: `options` is not an `object`.'); }
 
+      this._plugins = new Plugins(options);
+
+      this._moduleAnalyser = new ESComplexModule(options);
+   }
+
+   /**
+    * Processes the given modules and calculates metrics via plugins.
+    *
+    * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
+    * @param {object}   options - project processing options
+    *
+    * @returns {Promise}
+    */
+   analyze(modules, options = {})
+   {
       if (!Array.isArray(modules)) { throw new TypeError('Invalid modules'); }
+      if (typeof options !== 'object') { throw new TypeError('analyze error: `options` is not an `object`.'); }
+
+      const settings = this._plugins.onConfigure(options);
+
+      this._plugins.onProjectStart(settings);
 
       const reports = modules.map((m) =>
       {
@@ -19,10 +45,8 @@ export default class ESComplexProject
 
          try
          {
-            report = moduleAnalyser.analyze(m.ast, options);
-
+            report = this._moduleAnalyser.analyze(m.ast, options);
             report.path = m.path;
-
             return report;
          }
          catch (error)
@@ -33,285 +57,67 @@ export default class ESComplexProject
          }
       }, []);
 
-      if (options.skipCalculation)
-      {
-         return { reports };
-      }
+      const results = { reports };
 
-      return this.processResults({ reports }, options.noCoreSize);
+      if (options.skipCalculation) { return results; }
+
+      this._plugins.onProjectEnd(results);
+
+      return results;
    }
 
-   processResults(result, noCoreSize)
+   /**
+    * Wraps in a Promise processing the given modules and calculates metrics via plugins.
+    *
+    * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
+    * @param {object}   options - project processing options
+    *
+    * @returns {Promise}
+    */
+   analyzeThen(modules, options = {})
    {
-      this.createAdjacencyMatrix(result);
-      if (!noCoreSize)
+      return new Promise((resolve, reject) =>
       {
-         this.createVisibilityMatrix(result);
-         this.setCoreSize(result);
-      }
-
-      this.calculateAverages(result);
-
-      return result;
-   }
-
-   createAdjacencyMatrix(result)
-   {
-      const adjacencyMatrix = new Array(result.reports.length);
-      let density = 0;
-
-      result.reports.sort((lhs, rhs) => { return this.comparePaths(lhs.path, rhs.path); }).forEach((ignore, x) =>
-      {
-         adjacencyMatrix[x] = new Array(result.reports.length);
-         result.reports.forEach((ignore, y) =>
-         {
-            adjacencyMatrix[x][y] = this.getAdjacencyMatrixValue(result.reports, x, y);
-            if (adjacencyMatrix[x][y] === 1)
-            {
-               density += 1;
-            }
-         });
+         try { resolve(this.analyze(modules, options)); }
+         catch (err) { reject(err); }
       });
-
-      result.adjacencyMatrix = adjacencyMatrix;
-      result.firstOrderDensity = this.percentifyDensity(density, adjacencyMatrix);
    }
 
-   comparePaths(lhs, rhs)
+   /**
+    * Processes the an existing project report and calculates metrics via plugins.
+    *
+    * @param {Array}    reports - An object hash with a `reports` entry that is an Array of module results.
+    * @param {object}   options - project processing options
+    *
+    * @returns {Promise}
+    */
+   processResults(reports, options = {})
    {
-      const lsplit = lhs.split(path.sep);
-      const rsplit = rhs.split(path.sep);
+      if (typeof reports !== 'object') { throw new TypeError('Invalid reports'); }
+      if (typeof options !== 'object') { throw new TypeError('processResults error: `options` is not an `object`.'); }
 
-      if (lsplit.length < rsplit.length || (lsplit.length === rsplit.length && lhs < rhs)) { return -1; }
+      const settings = this._plugins.onConfigure(options);
 
-      if (lsplit.length > rsplit.length || (lsplit.length === rsplit.length && lhs > rhs)) { return 1; }
+      this._plugins.onProjectStart(settings);
+      this._plugins.onProjectEnd(reports);
 
-      return 0;
+      return reports;
    }
 
-   getAdjacencyMatrixValue(reports, x, y)
+   /**
+    * Wraps in a Promise processing an existing project report and calculates metrics via plugins.
+    *
+    * @param {Array}    reports - An object hash with a `reports` entry that is an Array of module results.
+    * @param {object}   options - project processing options
+    *
+    * @returns {Promise}
+    */
+   processResultsThen(reports, options = {})
    {
-      if (x === y) { return 0; }
-
-      if (this.doesDependencyExist(reports[x], reports[y])) { return 1; }
-
-      return 0;
-   }
-
-   doesDependencyExist(from, to)
-   {
-      return from.dependencies.reduce((result, dependency) =>
+      return new Promise((resolve, reject) =>
       {
-         if (result === false) { return this.checkDependency(from.path, dependency, to.path); }
-
-         return true;
-      }, false);
-   }
-
-   checkDependency(from, dependency, to)
-   {
-      if (this.isCommonJSDependency(dependency))
-      {
-         if (this.isInternalCommonJSDependency(dependency)) { return this.isDependency(from, dependency, to); }
-
-         return false;
-      }
-
-      return this.isDependency(from, dependency, to);
-   }
-
-   isCommonJSDependency(dependency)
-   {
-      return dependency.type === 'cjs';
-   }
-
-   isInternalCommonJSDependency(dependency)
-   {
-      return dependency.path[0] === '.' &&
-       (dependency.path[1] === path.sep || (dependency.path[1] === '.' && dependency.path[2] === path.sep));
-   }
-
-   isDependency(from, dependency, to)
-   {
-      let dependencyPath = dependency.path;
-
-      if (path.extname(dependencyPath) === '') { dependencyPath += path.extname(to); }
-
-      return path.resolve(path.dirname(from), dependencyPath) === to;
-   }
-
-   percentifyDensity(density, matrix)
-   {
-      return this.percentify(density, matrix.length * matrix.length);
-   }
-
-   percentify(value, limit)
-   {
-      if (limit === 0) { return 0; }
-
-      return (value / limit) * 100;
-   }
-
-   // implementation of floydWarshall alg for calculating visibility matrix in O(n^3) instead of O(n^4) with successive
-   // raising of powers
-   createVisibilityMatrix(result)
-   {
-      let changeCost = 0, i, j, k, visibilityMatrix;
-
-      visibilityMatrix = this.adjacencyToDistMatrix(result.adjacencyMatrix);
-      const matrixLen = visibilityMatrix.length;
-
-      for (k = 0; k < matrixLen; k += 1)
-      {
-         for (i = 0; i < matrixLen; i += 1)
-         {
-            for (j = 0; j < matrixLen; j += 1)
-            {
-               if (visibilityMatrix[i][j] > visibilityMatrix[i][k] + visibilityMatrix[k][j])
-               {
-                  visibilityMatrix[i][j] = visibilityMatrix[i][k] + visibilityMatrix[k][j];
-               }
-            }
-         }
-      }
-
-      // convert back from a distance matrix to adjacency matrix, while also calculating change cost
-      visibilityMatrix = visibilityMatrix.map((row, rowIndex) =>
-      {
-         return row.map((value, columnIndex) =>
-         {
-            if (value < Infinity)
-            {
-               changeCost += 1;
-
-               if (columnIndex !== rowIndex)
-               {
-                  return 1;
-               }
-            }
-
-            return 0;
-         });
-      });
-
-      result.visibilityMatrix = visibilityMatrix;
-      result.changeCost = this.percentifyDensity(changeCost, visibilityMatrix);
-   }
-
-   adjacencyToDistMatrix(matrix)
-   {
-      const distMatrix = [];
-      let i, j, value;
-      for (i = 0; i < matrix.length; i += 1)
-      {
-         distMatrix.push([]);
-         for (j = 0; j < matrix[i].length; j += 1)
-         {
-            value = null;
-            if (i === j)
-            {
-               value = 1;
-            }
-            else
-            {
-               // where we have 0, set distance to Infinity
-               value = matrix[i][j] || Infinity;
-            }
-            distMatrix[i][j] = value;
-         }
-      }
-      return distMatrix;
-   }
-
-   setCoreSize(result)
-   {
-      if (result.firstOrderDensity === 0)
-      {
-         result.coreSize = 0;
-         return;
-      }
-
-      const fanIn = new Array(result.visibilityMatrix.length);
-      const fanOut = new Array(result.visibilityMatrix.length);
-      const boundaries = {};
-      let coreSize = 0;
-
-      result.visibilityMatrix.forEach((row, rowIndex) =>
-      {
-         fanIn[rowIndex] = row.reduce((sum, value, valueIndex) =>
-         {
-            if (rowIndex === 0)
-            {
-               fanOut[valueIndex] = value;
-            }
-            else
-            {
-               fanOut[valueIndex] += value;
-            }
-
-            return sum + value;
-         }, 0);
-      });
-
-      // Boundary values can also be chosen by looking for discontinuity in the
-      // distribution of values, but I've chosen the median to keep it simple.
-      boundaries.fanIn = this.getMedian(fanIn.slice());
-      boundaries.fanOut = this.getMedian(fanOut.slice());
-
-      result.visibilityMatrix.forEach((ignore, index) =>
-      {
-         if (fanIn[index] >= boundaries.fanIn && fanOut[index] >= boundaries.fanOut)
-         {
-            coreSize += 1;
-         }
-      });
-
-      result.coreSize = this.percentify(coreSize, result.visibilityMatrix.length);
-   }
-
-   getMedian(values)
-   {
-      values.sort(this.compareNumbers);
-
-      // Checks of values.length is odd.
-      if (values.length % 2)
-      {
-         return values[(values.length - 1) / 2];
-      }
-
-      return (values[(values.length - 2) / 2] + values[values.length / 2]) / 2;
-   }
-
-   compareNumbers(lhs, rhs)
-   {
-      if (lhs < rhs) { return -1; }
-      if (lhs > rhs) { return 1; }
-      return 0;
-   }
-
-   calculateAverages(result)
-   {
-      let divisor;
-
-      const sums = {
-         loc: 0,
-         cyclomatic: 0,
-         effort: 0,
-         params: 0,
-         maintainability: 0
-      };
-
-      if (result.reports.length === 0) { divisor = 1; }
-      else { divisor = result.reports.length; }
-
-      result.reports.forEach((report) =>
-      {
-         Object.keys(sums).forEach((key) => { sums[key] += report[key]; });
-      });
-
-      Object.keys(sums).forEach((key) =>
-      {
-         result[key] = sums[key] / divisor;
+         try { resolve(this.processResults(reports, options)); }
+         catch (err) { reject(err); }
       });
    }
 }

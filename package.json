@@ -21,7 +21,8 @@
     }
   ],
   "dependencies": {
-    "typhonjs-escomplex-module": "git+https://git@github.com/typhonjs-node-plugin/typhonjs-escomplex-module.git",
+    "escomplex-plugin-metrics-project": "git+https://git@github.com/typhonjs-node-escomplex/escomplex-plugin-metrics-project.git",
+    "typhonjs-escomplex-module": "git+https://git@github.com/typhonjs-node-escomplex/typhonjs-escomplex-module.git",
     "typhonjs-plugin-manager": "git+https://git@github.com/typhonjs-node-plugin/typhonjs-plugin-manager.git"
   },
   "devDependencies": {
