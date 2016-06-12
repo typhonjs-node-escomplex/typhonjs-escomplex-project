@@ -12,19 +12,24 @@ export default class ESComplexProject
    /**
     * Initializes ESComplexProject.
     *
-    * @param {object}   options - module options including user plugins to load including:
+    * @param {object}   options - module and project options including user plugins to load including:
     * ```
-    * (boolean)         loadDefaultPlugins - When false ESComplexProject will not load any default plugins.
-    * (Array<Object>)   plugins - A list of ESComplexProject plugins that have already been instantiated.
+    * (object)             module - Provides an object hash of the following options for the module runtime:
+    *    (boolean)         loadDefaultPlugins - When false ESComplexProject will not load any default plugins.
+    *    (Array<Object>)   plugins - A list of ESComplexProject plugins that have already been instantiated.
+    *
+    * (object)             project - Provides an object hash of the following options for the project runtime:
+    *    (boolean)         loadDefaultPlugins - When false ESComplexProject will not load any default plugins.
+    *    (Array<Object>)   plugins - A list of ESComplexProject plugins that have already been instantiated.
     * ```
     */
    constructor(options = {})
    {
       if (typeof options !== 'object') { throw new TypeError('ctor error: `options` is not an `object`.'); }
 
-      this._plugins = new Plugins(options);
+      this._plugins = new Plugins(options.project);
 
-      this._escomplexModule = new ESComplexModule(options);
+      this._escomplexModule = new ESComplexModule(options.module);
    }
 
    /**
