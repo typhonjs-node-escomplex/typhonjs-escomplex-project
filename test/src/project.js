@@ -5,7 +5,7 @@ import { assert }       from 'chai';
 import parsers          from './parsers';
 import * as testconfig  from './testconfig';
 
-const modulePath = '../../dist';
+import escomplexProject from '../../src/index.js';
 
 if (testconfig.modules['project'])
 {
@@ -13,48 +13,28 @@ if (testconfig.modules['project'])
    {
       suite(`(${Parser.name}) project:`, () =>
       {
-         test('require does not throw', () =>
-         {
-            assert.doesNotThrow(() =>
-            {
-               require(modulePath);
-            });
-         });
-
          test('require returns object', () =>
          {
-            assert.isObject(require(modulePath));
+            assert.isObject(escomplexProject);
          });
 
          suite('require:', () =>
          {
-            let cr;
-
-            setup(() =>
-            {
-               cr = require(modulePath);
-            });
-
-            teardown(() =>
-            {
-               cr = undefined;
-            });
-
             test('analyze function is exported', () =>
             {
-               assert.isFunction(cr.analyze);
+               assert.isFunction(escomplexProject.analyze);
             });
 
             test('processResults function is exported', () =>
             {
-               assert.isFunction(cr.processResults);
+               assert.isFunction(escomplexProject.processResults);
             });
 
             test('analyze throws when modules is object', () =>
             {
                assert.throws(() =>
                {
-                  cr.analyze({
+                  escomplexProject.analyze({
                      body: [],
                      loc: {
                         start: {
@@ -72,7 +52,7 @@ if (testconfig.modules['project'])
             {
                assert.doesNotThrow(() =>
                {
-                  cr.analyze([]);
+                  escomplexProject.analyze([]);
                });
             });
 
@@ -82,7 +62,7 @@ if (testconfig.modules['project'])
 
                setup(() =>
                {
-                  result = cr.analyze([]);
+                  result = escomplexProject.analyze([]);
                });
 
                teardown(() =>
@@ -162,7 +142,7 @@ if (testconfig.modules['project'])
 
                setup(() =>
                {
-                  result = cr.analyze([{ ast: Parser.parse('if (true) { "foo"; } else { "bar"; }'), path: 'a' }]);
+                  result = escomplexProject.analyze([{ ast: Parser.parse('if (true) { "foo"; } else { "bar"; }'), path: 'a' }]);
                });
 
                teardown(() =>
@@ -323,7 +303,7 @@ if (testconfig.modules['project'])
 
                setup(() =>
                {
-                  result = cr.analyze([
+                  result = escomplexProject.analyze([
                      {
                         ast: Parser.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }'),
                         path: 'b'
@@ -529,7 +509,7 @@ if (testconfig.modules['project'])
                      ast: Parser.parse('if (true) { "foo"; } else { "bar"; }'),
                      path: 'a'
                   });
-                  reportsOnly = cr.analyze(modules, { skipCalculation: true });
+                  reportsOnly = escomplexProject.analyze(modules, { skipCalculation: true });
                });
 
                test('should not have aggregates if we call with skipCalculation', () =>
@@ -539,7 +519,7 @@ if (testconfig.modules['project'])
 
                test('should not have coreSize or visibilityMatrix if we call with noCoreSize', () =>
                {
-                  const results = cr.analyze(modules, { noCoreSize: true });
+                  const results = escomplexProject.analyze(modules, { noCoreSize: true });
                   assert.notOk(results.coreSize);
                   assert.notOk(results.visibilityMatrix);
                   // make sure we still have a few things though
@@ -549,14 +529,14 @@ if (testconfig.modules['project'])
 
                test('should be able to run processResults', () =>
                {
-                  const fullReport = cr.analyze(modules);
-                  const calcReport = cr.processResults(reportsOnly);
+                  const fullReport = escomplexProject.analyze(modules);
+                  const calcReport = escomplexProject.processResults(reportsOnly);
                   assert.deepEqual(calcReport, fullReport);
                });
 
                test('should be able to run processResults without calculating coreSize', () =>
                {
-                  const results = cr.processResults(reportsOnly, { noCoreSize: true });
+                  const results = escomplexProject.processResults(reportsOnly, { noCoreSize: true });
                   assert.notOk(results.coreSize);
                   assert.notOk(results.visibilityMatrix);
                   // make sure we still have a few things though
@@ -572,7 +552,7 @@ if (testconfig.modules['project'])
 
                setup(() =>
                {
-                  result = cr.analyze([
+                  result = escomplexProject.analyze([
                      { ast: Parser.parse('require("./a");"d";'), path: '/d.js' },
                      { ast: Parser.parse('require("./b");"c";'), path: '/a/c.js' },
                      { ast: Parser.parse('require("./c");"b";'), path: '/a/b.js' },
@@ -644,7 +624,7 @@ if (testconfig.modules['project'])
 
                setup(() =>
                {
-                  result = cr.analyze([
+                  result = escomplexProject.analyze([
                      { ast: Parser.parse('"f";'), path: '/a/c/f.js' },
                      { ast: Parser.parse('require("./f");"e";'), path: '/a/c/e.js' },
                      { ast: Parser.parse('"d";'), path: '/a/b/d.js' },
@@ -752,9 +732,8 @@ if (testconfig.modules['project'])
                test('running calculations should be sufficently fast', function()
                {
                   this.timeout(50);
-                  cr.processResults(resultFixture);
+                  escomplexProject.processResults(resultFixture);
                });
-
             });
          });
       });
