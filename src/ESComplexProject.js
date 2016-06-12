@@ -4,12 +4,19 @@ import ESComplexModule  from 'typhonjs-escomplex-module/src/ESComplexModule.js';
 
 import Plugins          from './Plugins.js';
 
+/**
+ * Provides a runtime to invoke ESComplexProject plugins for processing / metrics calculations of projects.
+ */
 export default class ESComplexProject
 {
    /**
-    * Initializes ESComplexProject
+    * Initializes ESComplexProject.
     *
-    * @param {object}   options - module options
+    * @param {object}   options - module options including user plugins to load including:
+    * ```
+    * (boolean)         loadDefaultPlugins - When false ESComplexProject will not load any default plugins.
+    * (Array<Object>)   plugins - A list of ESComplexProject plugins that have already been instantiated.
+    * ```
     */
    constructor(options = {})
    {
@@ -21,16 +28,16 @@ export default class ESComplexProject
    }
 
    /**
-    * Processes the given modules and calculates metrics via plugins.
+    * Processes the given modules and calculates project metrics via plugins.
     *
     * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
-    * @param {object}   options - project processing options
+    * @param {object}   options - (Optional) project processing options.
     *
-    * @returns {Promise}
+    * @returns {{reports: Array<{}>}}
     */
    analyze(modules, options = {})
    {
-      if (!Array.isArray(modules)) { throw new TypeError('Invalid modules'); }
+      if (!Array.isArray(modules)) { throw new TypeError('analyze error: `modules` is not an `array`.'); }
       if (typeof options !== 'object') { throw new TypeError('analyze error: `options` is not an `object`.'); }
 
       const settings = this._plugins.onConfigure(options);
@@ -41,7 +48,7 @@ export default class ESComplexProject
       {
          let report;
 
-         if (m.path === '') { throw new Error('Invalid path'); }
+         if (m.path === '') { throw new Error('analyze error: Invalid path'); }
 
          try
          {
@@ -51,7 +58,7 @@ export default class ESComplexProject
          }
          catch (error)
          {
-            // These error messages are useless unless they contain the module path.
+            // Include the module path to distinguish the actual offending entry.
             error.message = `${m.path}: ${error.message}`;
             throw error;
          }
@@ -67,12 +74,35 @@ export default class ESComplexProject
    }
 
    /**
+    * Processes the an existing project report and calculates metrics via plugins.
+    *
+    * @param {object}   results - An object hash with a `reports` entry that is an Array of module results.
+    * @param {object}   options - (Optional) project processing options.
+    *
+    * @returns {{reports: Array<{}>}}
+    */
+   processResults(results, options = {})
+   {
+      if (typeof results !== 'object') { throw new TypeError('processResults error: `results` is not an `object`.'); }
+      if (typeof options !== 'object') { throw new TypeError('processResults error: `options` is not an `object`.'); }
+
+      const settings = this._plugins.onConfigure(options);
+
+      this._plugins.onProjectStart(settings);
+      this._plugins.onProjectEnd(results);
+
+      return results;
+   }
+
+   // Asynchronous Promise based methods ----------------------------------------------------------------------------
+
+   /**
     * Wraps in a Promise processing the given modules and calculates metrics via plugins.
     *
     * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
     * @param {object}   options - project processing options
     *
-    * @returns {Promise}
+    * @returns {Promise<{reports: Array<{}>}>}
     */
    analyzeThen(modules, options = {})
    {
@@ -84,39 +114,18 @@ export default class ESComplexProject
    }
 
    /**
-    * Processes the an existing project report and calculates metrics via plugins.
-    *
-    * @param {object}   reports - An object hash with a `reports` entry that is an Array of module results.
-    * @param {object}   options - project processing options
-    *
-    * @returns {Promise}
-    */
-   processResults(reports, options = {})
-   {
-      if (typeof reports !== 'object') { throw new TypeError('Invalid reports'); }
-      if (typeof options !== 'object') { throw new TypeError('processResults error: `options` is not an `object`.'); }
-
-      const settings = this._plugins.onConfigure(options);
-
-      this._plugins.onProjectStart(settings);
-      this._plugins.onProjectEnd(reports);
-
-      return reports;
-   }
-
-   /**
     * Wraps in a Promise processing an existing project report and calculates metrics via plugins.
     *
-    * @param {object}   reports - An object hash with a `reports` entry that is an Array of module results.
-    * @param {object}   options - project processing options
+    * @param {object}   results - An object hash with a `reports` entry that is an Array of module results.
+    * @param {object}   options - (Optional) project processing options.
     *
-    * @returns {Promise}
+    * @returns {Promise<{reports: Array<{}>}>}
     */
-   processResultsThen(reports, options = {})
+   processResultsThen(results, options = {})
    {
       return new Promise((resolve, reject) =>
       {
-         try { resolve(this.processResults(reports, options)); }
+         try { resolve(this.processResults(results, options)); }
          catch (err) { reject(err); }
       });
    }

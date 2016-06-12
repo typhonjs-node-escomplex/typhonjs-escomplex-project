@@ -20,11 +20,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/**
+ * Provides a runtime to invoke ESComplexProject plugins for processing / metrics calculations of projects.
+ */
+
 var ESComplexProject = function () {
    /**
-    * Initializes ESComplexProject
+    * Initializes ESComplexProject.
     *
-    * @param {object}   options - module options
+    * @param {object}   options - module options including user plugins to load including:
+    * ```
+    * (boolean)         loadDefaultPlugins - When false ESComplexProject will not load any default plugins.
+    * (Array<Object>)   plugins - A list of ESComplexProject plugins that have already been instantiated.
+    * ```
     */
 
    function ESComplexProject() {
@@ -42,12 +50,12 @@ var ESComplexProject = function () {
    }
 
    /**
-    * Processes the given modules and calculates metrics via plugins.
+    * Processes the given modules and calculates project metrics via plugins.
     *
     * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
-    * @param {object}   options - project processing options
+    * @param {object}   options - (Optional) project processing options.
     *
-    * @returns {Promise}
+    * @returns {{reports: Array<{}>}}
     */
 
 
@@ -59,7 +67,7 @@ var ESComplexProject = function () {
          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
          if (!Array.isArray(modules)) {
-            throw new TypeError('Invalid modules');
+            throw new TypeError('analyze error: `modules` is not an `array`.');
          }
          if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object') {
             throw new TypeError('analyze error: `options` is not an `object`.');
@@ -73,7 +81,7 @@ var ESComplexProject = function () {
             var report = void 0;
 
             if (m.path === '') {
-               throw new Error('Invalid path');
+               throw new Error('analyze error: Invalid path');
             }
 
             try {
@@ -81,7 +89,7 @@ var ESComplexProject = function () {
                report.path = m.path;
                return report;
             } catch (error) {
-               // These error messages are useless unless they contain the module path.
+               // Include the module path to distinguish the actual offending entry.
                error.message = m.path + ': ' + error.message;
                throw error;
             }
@@ -99,12 +107,43 @@ var ESComplexProject = function () {
       }
 
       /**
+       * Processes the an existing project report and calculates metrics via plugins.
+       *
+       * @param {object}   results - An object hash with a `reports` entry that is an Array of module results.
+       * @param {object}   options - (Optional) project processing options.
+       *
+       * @returns {{reports: Array<{}>}}
+       */
+
+   }, {
+      key: 'processResults',
+      value: function processResults(results) {
+         var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+         if ((typeof results === 'undefined' ? 'undefined' : _typeof(results)) !== 'object') {
+            throw new TypeError('processResults error: `results` is not an `object`.');
+         }
+         if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object') {
+            throw new TypeError('processResults error: `options` is not an `object`.');
+         }
+
+         var settings = this._plugins.onConfigure(options);
+
+         this._plugins.onProjectStart(settings);
+         this._plugins.onProjectEnd(results);
+
+         return results;
+      }
+
+      // Asynchronous Promise based methods ----------------------------------------------------------------------------
+
+      /**
        * Wraps in a Promise processing the given modules and calculates metrics via plugins.
        *
        * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
        * @param {object}   options - project processing options
        *
-       * @returns {Promise}
+       * @returns {Promise<{reports: Array<{}>}>}
        */
 
    }, {
@@ -124,53 +163,24 @@ var ESComplexProject = function () {
       }
 
       /**
-       * Processes the an existing project report and calculates metrics via plugins.
-       *
-       * @param {object}   reports - An object hash with a `reports` entry that is an Array of module results.
-       * @param {object}   options - project processing options
-       *
-       * @returns {Promise}
-       */
-
-   }, {
-      key: 'processResults',
-      value: function processResults(reports) {
-         var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-         if ((typeof reports === 'undefined' ? 'undefined' : _typeof(reports)) !== 'object') {
-            throw new TypeError('Invalid reports');
-         }
-         if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object') {
-            throw new TypeError('processResults error: `options` is not an `object`.');
-         }
-
-         var settings = this._plugins.onConfigure(options);
-
-         this._plugins.onProjectStart(settings);
-         this._plugins.onProjectEnd(reports);
-
-         return reports;
-      }
-
-      /**
        * Wraps in a Promise processing an existing project report and calculates metrics via plugins.
        *
-       * @param {object}   reports - An object hash with a `reports` entry that is an Array of module results.
-       * @param {object}   options - project processing options
+       * @param {object}   results - An object hash with a `reports` entry that is an Array of module results.
+       * @param {object}   options - (Optional) project processing options.
        *
-       * @returns {Promise}
+       * @returns {Promise<{reports: Array<{}>}>}
        */
 
    }, {
       key: 'processResultsThen',
-      value: function processResultsThen(reports) {
+      value: function processResultsThen(results) {
          var _this3 = this;
 
          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
          return new Promise(function (resolve, reject) {
             try {
-               resolve(_this3.processResults(reports, options));
+               resolve(_this3.processResults(results, options));
             } catch (err) {
                reject(err);
             }
