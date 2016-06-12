@@ -107,7 +107,7 @@ var ESComplexProject = function () {
       }
 
       /**
-       * Processes the an existing project report and calculates metrics via plugins.
+       * Processes existing project results and calculates metrics via plugins.
        *
        * @param {object}   results - An object hash with a `reports` entry that is an Array of module results.
        * @param {object}   options - (Optional) project processing options.
@@ -163,7 +163,7 @@ var ESComplexProject = function () {
       }
 
       /**
-       * Wraps in a Promise processing an existing project report and calculates metrics via plugins.
+       * Wraps in a Promise processing of existing project results and calculates metrics via plugins.
        *
        * @param {object}   results - An object hash with a `reports` entry that is an Array of module results.
        * @param {object}   options - (Optional) project processing options.
