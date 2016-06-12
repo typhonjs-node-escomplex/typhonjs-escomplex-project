@@ -16,7 +16,7 @@ export default class ESComplexProject
     * ```
     * (object)             module - Provides an object hash of the following options for the module runtime:
     *    (boolean)         loadDefaultPlugins - When false ESComplexProject will not load any default plugins.
-    *    (Array<Object>)   plugins - A list of ESComplexProject plugins that have already been instantiated.
+    *    (Array<Object>)   plugins - A list of ESComplexModule plugins that have already been instantiated.
     *
     * (object)             project - Provides an object hash of the following options for the project runtime:
     *    (boolean)         loadDefaultPlugins - When false ESComplexProject will not load any default plugins.
