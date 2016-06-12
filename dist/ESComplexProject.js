@@ -46,7 +46,7 @@ var ESComplexProject = function () {
 
       this._plugins = new _Plugins2.default(options);
 
-      this._moduleAnalyser = new _ESComplexModule2.default(options);
+      this._escomplexModule = new _ESComplexModule2.default(options);
    }
 
    /**
@@ -85,7 +85,7 @@ var ESComplexProject = function () {
             }
 
             try {
-               report = _this._moduleAnalyser.analyze(m.ast, options);
+               report = _this._escomplexModule.analyze(m.ast, options);
                report.path = m.path;
                return report;
             } catch (error) {
@@ -97,7 +97,7 @@ var ESComplexProject = function () {
 
          var results = { reports: reports };
 
-         if (options.skipCalculation) {
+         if (settings.skipCalculation) {
             return results;
          }
 

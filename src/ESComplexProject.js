@@ -24,7 +24,7 @@ export default class ESComplexProject
 
       this._plugins = new Plugins(options);
 
-      this._moduleAnalyser = new ESComplexModule(options);
+      this._escomplexModule = new ESComplexModule(options);
    }
 
    /**
@@ -52,7 +52,7 @@ export default class ESComplexProject
 
          try
          {
-            report = this._moduleAnalyser.analyze(m.ast, options);
+            report = this._escomplexModule.analyze(m.ast, options);
             report.path = m.path;
             return report;
          }
@@ -66,7 +66,7 @@ export default class ESComplexProject
 
       const results = { reports };
 
-      if (options.skipCalculation) { return results; }
+      if (settings.skipCalculation) { return results; }
 
       this._plugins.onProjectEnd(results);
 
