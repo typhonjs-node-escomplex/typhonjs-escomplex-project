@@ -10,7 +10,7 @@
 [![Coverage](https://img.shields.io/codecov/c/github/typhonjs-node-escomplex/typhonjs-escomplex-project.svg)](https://codecov.io/github/typhonjs-node-escomplex/typhonjs-escomplex-project)
 [![Dependency Status](https://www.versioneye.com/user/projects/575de44d7757a00041b3b906/badge.svg?style=flat)](https://www.versioneye.com/user/projects/575de44d7757a00041b3b906)
 
-Provides project oriented AST processing for complexity reports.
+Provides project oriented AST processing for typhonjs-escomplex complexity reports.
 
 More information forthcoming. This NPM module can be installed as a dependency in `package.json` as follows:
 ```
@@ -23,7 +23,7 @@ An ES6 example follows:
 ```
 import escomplexProject from 'typhonjs-escomplex-project';
 
-const modules = 
+const modules =
 [
    { ast: <some parsed AST>, path: 'a/file/path/1' },
    { ast: <some parsed AST>, path: 'a/file/path/2' }
@@ -37,7 +37,7 @@ A CJS example follows:
 ```
 var escomplexProject = require('typhonjs-escomplex-project');
 
-var modules = 
+var modules =
 [
    { ast: <some parsed AST>, path: 'a/file/path/1' },
    { ast: <some parsed AST>, path: 'a/file/path/2' }
