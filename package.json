@@ -1,6 +1,6 @@
 {
   "name": "typhonjs-escomplex-project",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Provides project oriented AST processing for typhonjs-escomplex complexity reports.",
   "homepage": "https://github.com/typhonjs-node-escomplex/typhonjs-escomplex-module",
   "bugs": "https://github.com/typhonjs-node-escomplex/typhonjs-escomplex-project/issues",
