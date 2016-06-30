@@ -2,7 +2,7 @@
 
 import ESComplexModule  from 'typhonjs-escomplex-module/src/ESComplexModule';
 
-import Plugins          from './Plugins.js';
+import Plugins          from './Plugins';
 
 /**
  * Provides a runtime to invoke ESComplexProject plugins for processing / metrics calculations of projects.
