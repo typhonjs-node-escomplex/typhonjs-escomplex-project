@@ -5,7 +5,7 @@ import { assert }       from 'chai';
 import parsers          from './parsers';
 import * as testconfig  from './testconfig';
 
-import escomplexProject from '../../src/index.js';
+import escomplexProject from '../../src';
 
 if (testconfig.modules['project'])
 {
