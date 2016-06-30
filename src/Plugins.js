@@ -1,8 +1,8 @@
 'use strict';
 
-import PluginManager          from 'typhonjs-plugin-manager';
+import PluginManager          from 'typhonjs-plugin-manager/src/PluginManager';
 
-import PluginMetricsProject   from 'escomplex-plugin-metrics-project/src/PluginMetricsProject.js';
+import PluginMetricsProject   from 'escomplex-plugin-metrics-project/src/PluginMetricsProject';
 
 /**
  * Provides a wrapper around PluginManager for ESComplexProject. Several convenience methods for the plugin callbacks

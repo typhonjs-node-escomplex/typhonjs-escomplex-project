@@ -1,6 +1,6 @@
 'use strict';
 
-import ESComplexModule  from 'typhonjs-escomplex-module/src/ESComplexModule.js';
+import ESComplexModule  from 'typhonjs-escomplex-module/src/ESComplexModule';
 
 import Plugins          from './Plugins.js';
 

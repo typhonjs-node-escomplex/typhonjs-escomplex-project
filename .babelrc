@@ -6,7 +6,8 @@
     ["module-alias",
       [
         { "src": "npm:escomplex-plugin-metrics-project/dist", "expose": "escomplex-plugin-metrics-project/src" },
-        { "src": "npm:typhonjs-escomplex-module/dist", "expose": "typhonjs-escomplex-module/src" }
+        { "src": "npm:typhonjs-escomplex-module/dist", "expose": "typhonjs-escomplex-module/src" },
+        { "src": "npm:typhonjs-plugin-manager/dist", "expose": "typhonjs-plugin-manager/src" }
       ]
     ]
   ]

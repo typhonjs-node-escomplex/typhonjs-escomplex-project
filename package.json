@@ -21,8 +21,8 @@
     }
   ],
   "dependencies": {
-    "escomplex-plugin-metrics-project": "^0.0.1",
-    "typhonjs-escomplex-module": "^0.0.1",
+    "escomplex-plugin-metrics-project": "^0.0.2",
+    "typhonjs-escomplex-module": "^0.0.2",
     "typhonjs-plugin-manager": "^0.0.1"
   },
   "devDependencies": {

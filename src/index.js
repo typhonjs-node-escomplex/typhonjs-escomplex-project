@@ -1,6 +1,6 @@
 'use strict';
 
-import ESComplexProject from './ESComplexProject.js';
+import ESComplexProject from './ESComplexProject';
 
 /**
  * Exports the default instance of ESComplexProject which is associated with the main entry in `package.json`.

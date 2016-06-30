@@ -191,9 +191,9 @@ if (testconfig.modules['project'])
                assert.strictEqual(result.reports[0].aggregate.cyclomaticDensity, 50);
             });
 
-            test('first report functions is empty', () =>
+            test('first report methods is empty', () =>
             {
-               assert.lengthOf(result.reports[0].functions, 0);
+               assert.lengthOf(result.reports[0].methods, 0);
             });
 
             test('first report aggregate has correct Halstead total operators', () =>
@@ -358,9 +358,9 @@ if (testconfig.modules['project'])
                assert.strictEqual(result.reports[0].aggregate.cyclomaticDensity, 50);
             });
 
-            test('first report functions is empty', () =>
+            test('first report methods is empty', () =>
             {
-               assert.lengthOf(result.reports[0].functions, 0);
+               assert.lengthOf(result.reports[0].methods, 0);
             });
 
             test('first report aggregate has correct Halstead total operators', () =>
@@ -444,14 +444,14 @@ if (testconfig.modules['project'])
                assert.strictEqual(Math.round(result.reports[1].maintainability), 128);
             });
 
-            test('second report first function has correct parameter count', () =>
+            test('second report first method has correct parameter count', () =>
             {
-               assert.strictEqual(result.reports[1].functions[0].params, 2);
+               assert.strictEqual(result.reports[1].methods[0].params, 2);
             });
 
-            test('second report second function has correct parameter count', () =>
+            test('second report second method has correct parameter count', () =>
             {
-               assert.strictEqual(result.reports[1].functions[1].params, 2);
+               assert.strictEqual(result.reports[1].methods[1].params, 2);
             });
 
             test('second report aggregate has correct parameter count', () =>

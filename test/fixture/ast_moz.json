@@ -90,7 +90,7 @@
                 "line": 3,
                 "cyclomaticDensity": 19.51219512195122
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "walk",
                     "sloc": {
@@ -495,7 +495,7 @@
                 "line": 3,
                 "cyclomaticDensity": 37.5
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "module.exports",
                     "sloc": {
@@ -603,7 +603,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -732,7 +732,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -934,7 +934,7 @@
                 "line": 3,
                 "cyclomaticDensity": 16.666666666666664
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -1078,7 +1078,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -1186,7 +1186,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -1359,7 +1359,7 @@
                 "line": 3,
                 "cyclomaticDensity": 30
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -2014,7 +2014,7 @@
                 "line": 3,
                 "cyclomaticDensity": 33.33333333333333
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -2169,7 +2169,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -2283,7 +2283,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -2400,7 +2400,7 @@
                 "line": 3,
                 "cyclomaticDensity": 33.33333333333333
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -2551,7 +2551,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -2667,7 +2667,7 @@
                 "line": 3,
                 "cyclomaticDensity": 33.33333333333333
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -2827,7 +2827,7 @@
                 "line": 3,
                 "cyclomaticDensity": 33.33333333333333
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -2987,7 +2987,7 @@
                 "line": 3,
                 "cyclomaticDensity": 14.285714285714285
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -3150,7 +3150,7 @@
                 "line": 3,
                 "cyclomaticDensity": 14.285714285714285
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -3305,7 +3305,7 @@
                 "line": 3,
                 "cyclomaticDensity": 16.666666666666664
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -3461,7 +3461,7 @@
                 "line": 3,
                 "cyclomaticDensity": 22.22222222222222
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -3660,7 +3660,7 @@
                 "line": 3,
                 "cyclomaticDensity": 22.22222222222222
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -3824,7 +3824,7 @@
                 "line": 3,
                 "cyclomaticDensity": 28.57142857142857
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -4028,7 +4028,7 @@
                 "line": 3,
                 "cyclomaticDensity": 28.57142857142857
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -4197,7 +4197,7 @@
                 "line": 3,
                 "cyclomaticDensity": 33.33333333333333
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -4349,7 +4349,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -4469,7 +4469,7 @@
                 "line": 3,
                 "cyclomaticDensity": 14.285714285714285
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -4626,7 +4626,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -4734,7 +4734,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -4850,7 +4850,7 @@
                 "line": 3,
                 "cyclomaticDensity": 42.857142857142854
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -5045,7 +5045,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -5154,7 +5154,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -5262,7 +5262,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -5374,7 +5374,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -5493,7 +5493,7 @@
                 "line": 3,
                 "cyclomaticDensity": 33.33333333333333
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -5654,7 +5654,7 @@
                 "line": 3,
                 "cyclomaticDensity": 33.33333333333333
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -5808,7 +5808,7 @@
                 "line": 3,
                 "cyclomaticDensity": 16.666666666666664
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -5966,7 +5966,7 @@
                 "line": 3,
                 "cyclomaticDensity": 10
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -6168,7 +6168,7 @@
                 "line": 3,
                 "cyclomaticDensity": 33.33333333333333
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -6321,7 +6321,7 @@
                 "line": 3,
                 "cyclomaticDensity": 20
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "get",
                     "sloc": {
@@ -6471,7 +6471,7 @@
                 "line": 4,
                 "cyclomaticDensity": 15.789473684210526
             },
-            "functions": [
+            "methods": [
                 {
                     "name": "getSyntax",
                     "sloc": {
