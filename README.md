@@ -10,7 +10,7 @@
 [![Coverage](https://img.shields.io/codecov/c/github/typhonjs-node-escomplex/typhonjs-escomplex-project.svg)](https://codecov.io/github/typhonjs-node-escomplex/typhonjs-escomplex-project)
 [![Dependency Status](https://www.versioneye.com/user/projects/575de44d7757a00041b3b906/badge.svg?style=flat)](https://www.versioneye.com/user/projects/575de44d7757a00041b3b906)
 
-Provides project oriented AST processing for typhonjs-escomplex complexity reports.
+Provides project oriented AST processing for typhonjs-escomplex complexity reports. The following JS AST generators are supported / tested: [acorn](https://www.npmjs.com/package/acorn), [babylon](https://www.npmjs.com/package/babylon), [espree](https://www.npmjs.com/package/espree), [esprima](https://www.npmjs.com/package/esprima). Any compliant JS parser that supports Babylon or ESTree AST should work as well.
 
 More information forthcoming. This NPM module can be installed as a dependency in `package.json` as follows:
 ```
