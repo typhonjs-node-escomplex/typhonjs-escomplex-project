@@ -15,7 +15,7 @@ Provides project oriented AST processing for typhonjs-escomplex complexity repor
 More information forthcoming. This NPM module can be installed as a dependency in `package.json` as follows:
 ```
 "dependencies": {
-  "typhonjs-escomplex-project": "^0.0.1"
+  "typhonjs-escomplex-project": "^0.0.3"
 }
 ```
 
