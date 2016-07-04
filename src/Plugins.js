@@ -1,5 +1,3 @@
-'use strict';
-
 import PluginManager          from 'typhonjs-plugin-manager/src/PluginManager';
 
 import PluginMetricsProject   from 'escomplex-plugin-metrics-project/src/PluginMetricsProject';
@@ -44,11 +42,12 @@ export default class Plugins
    onConfigure(options)
    {
       /**
-       * Default settings with potential user override of `skipCalculation`.
-       * @type {{skipCalculation: boolean}}
+       * Default settings with potential user override of `serializeReports` and `skipCalculation`.
+       * @type {{serializeReports: boolean}, {skipCalculation: boolean}}
        */
       const settings =
       {
+         serializeReports: typeof options.serializeReports === 'boolean' ? options.serializeReports : true,
          skipCalculation: typeof options.skipCalculation === 'boolean' ? options.skipCalculation : false
       };
 
@@ -60,23 +59,25 @@ export default class Plugins
     * Initializes the default `report` object hash and then invokes the `onProjectStart` plugin callback for all loaded
     * plugins.
     *
+    * @param {object}   pathModule - Provides an object which matches the Node path module.
     * @param {object}   settings - Settings for project processing.
     */
-   onProjectStart(settings)
+   onProjectStart(pathModule, settings)
    {
-      this._pluginManager.invoke('onProjectStart', { settings }, false);
+      this._pluginManager.invoke('onProjectStart', { pathModule, settings }, false);
    }
 
    /**
     * Invokes the `onProjectEnd` plugin callback for all loaded plugins such they might finish calculating results.
     *
-    * @param {{reports: Array<{}>}} results -
+    * @param {object}   pathModule - Provides an object which matches the Node path module.
+    * @param {{reports: Array<ModuleReport>}} results -
     *
     * @returns {{reports: Array<{}>}}
     */
-   onProjectEnd(results)
+   onProjectEnd(pathModule, results)
    {
-      const event = this._pluginManager.invoke('onProjectEnd', { results }, false);
+      const event = this._pluginManager.invoke('onProjectEnd', { pathModule, results }, false);
       return event !== null ? event.data.results : results;
    }
 }

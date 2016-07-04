@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Defines which modules to run tests.
  *
@@ -17,10 +15,10 @@ export const modules =
  */
 export const parsers =
 {
-   acorn: true,
+   acorn: false,
    babylon: true,
-   espree: true,
-   esprima: true
+   espree: false,
+   esprima: false
 };
 
 /**

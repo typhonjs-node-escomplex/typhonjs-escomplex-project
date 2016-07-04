@@ -1,9 +1,11 @@
-'use strict';
+import fs               from 'fs';
 
 import { assert }       from 'chai';
 
 import parsers          from './parsers';
 import * as testconfig  from './testconfig';
+
+import ProjectResult    from 'typhonjs-escomplex-commons/src/project/result/ProjectResult';
 
 import escomplexProject from '../../src';
 
@@ -11,6 +13,48 @@ if (testconfig.modules['project'])
 {
    parsers.forEach((Parser) =>
    {
+      // Load project source and local test files from NPM module typhonjs-escomplex-commons.
+
+      const s_LOCAL_TEST_FILES =
+      [
+         './node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js',
+         './node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js',
+         './node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js',
+
+         './src/ESComplexProject.js',
+         './src/index.js',
+         './src/Plugins.js'
+      ];
+
+      const s_LOCAL_TEST_DATA = s_LOCAL_TEST_FILES.map((filePath) =>
+      {
+         let srcPath = filePath;
+
+         // Remove leading `./node_modules/` from file path for the source path which is what is referenced in the code.
+         if (filePath.startsWith('./node_modules/'))
+         {
+            srcPath = filePath.replace(/^\.\/node_modules\//, '');
+         }
+
+         return {
+            ast: Parser.parse(fs.readFileSync(filePath, 'utf8')),
+            filePath,
+            srcPath
+         };
+      });
+
       suite(`(${Parser.name}) project:`, () =>
       {
          test('require returns object', () =>
@@ -28,14 +72,14 @@ if (testconfig.modules['project'])
             assert.isFunction(escomplexProject.processResults);
          });
 
-         test('analyzeThen function is exported', () =>
+         test('analyzeAsync function is exported', () =>
          {
-            assert.isFunction(escomplexProject.analyzeThen);
+            assert.isFunction(escomplexProject.analyzeAsync);
          });
 
-         test('processResultsThen function is exported', () =>
+         test('processResultsAsync function is exported', () =>
          {
-            assert.isFunction(escomplexProject.processResultsThen);
+            assert.isFunction(escomplexProject.processResultsAsync);
          });
 
          test('analyze throws when modules is object', () =>
@@ -64,11 +108,11 @@ if (testconfig.modules['project'])
             });
          });
 
-         test('analyzeThen does not throw when modules is array', () =>
+         test('analyzeAsync does not throw when modules is array', () =>
          {
             assert.doesNotThrow(() =>
             {
-               escomplexProject.analyzeThen([]);
+               escomplexProject.analyzeAsync([]);
             });
          });
 
@@ -101,14 +145,14 @@ if (testconfig.modules['project'])
                assert.lengthOf(result.reports, 0);
             });
 
-            test('adjacency matrix exists', () =>
+            test('adjacency list exists', () =>
             {
-               assert.isArray(result.adjacencyMatrix);
+               assert.isArray(result.adjacencyList);
             });
 
-            test('adjacency matrix has zero length', () =>
+            test('adjacency list has zero length', () =>
             {
-               assert.lengthOf(result.adjacencyMatrix, 0);
+               assert.lengthOf(result.adjacencyList, 0);
             });
 
             test('first-order density is correct', () =>
@@ -158,7 +202,7 @@ if (testconfig.modules['project'])
 
             setup(() =>
             {
-               result = escomplexProject.analyze([{ ast: Parser.parse('if (true) { "foo"; } else { "bar"; }'), path: 'a' }]);
+               result = escomplexProject.analyze([{ ast: Parser.parse('if (true) { "foo"; } else { "bar"; }'), srcPath: 'a' }]);
             });
 
             teardown(() =>
@@ -267,9 +311,9 @@ if (testconfig.modules['project'])
                assert.strictEqual(Math.round(result.reports[0].aggregate.halstead.time), 1);
             });
 
-            test('first report has correct path', () =>
+            test('first report has correct srcPath', () =>
             {
-               assert.strictEqual(result.reports[0].path, 'a');
+               assert.strictEqual(result.reports[0].srcPath, 'a');
             });
 
             test('first-order density is correct', () =>
@@ -322,9 +366,9 @@ if (testconfig.modules['project'])
                result = escomplexProject.analyze([
                   {
                      ast: Parser.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }'),
-                     path: 'b'
+                     srcPath: 'b'
                   },
-                  { ast: Parser.parse('if (true) { "foo"; } else { "bar"; }'), path: 'a' }
+                  { ast: Parser.parse('if (true) { "foo"; } else { "bar"; }'), srcPath: 'a' }
                ]);
             });
 
@@ -434,9 +478,9 @@ if (testconfig.modules['project'])
                assert.strictEqual(Math.round(result.reports[0].aggregate.halstead.time), 1);
             });
 
-            test('first report has correct path', () =>
+            test('first report has correct srcPath', () =>
             {
-               assert.strictEqual(result.reports[0].path, 'a');
+               assert.strictEqual(result.reports[0].srcPath, 'a');
             });
 
             test('second report maintainability index is correct', () =>
@@ -464,9 +508,9 @@ if (testconfig.modules['project'])
                assert.strictEqual(result.reports[1].params, 2);
             });
 
-            test('second report has correct path', () =>
+            test('second report has correct srcPath', () =>
             {
-               assert.strictEqual(result.reports[1].path, 'b');
+               assert.strictEqual(result.reports[1].srcPath, 'b');
             });
 
             test('first-order density is correct', () =>
@@ -512,34 +556,44 @@ if (testconfig.modules['project'])
 
          suite('two modules with different options:', () =>
          {
-            const modules = [];
+            const modules =
+            [
+               {
+                  ast: Parser.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }'),
+                  srcPath: 'b'
+               },
+               {
+                  ast: Parser.parse('if (true) { "foo"; } else { "bar"; }'),
+                  srcPath: 'a'
+               }
+            ];
+
             let reportsOnly;
 
             setup(() =>
             {
-               modules.push({
-                  ast: Parser.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }'),
-                  path: 'b'
-               });
-               modules.push({
-                  ast: Parser.parse('if (true) { "foo"; } else { "bar"; }'),
-                  path: 'a'
-               });
                reportsOnly = escomplexProject.analyze(modules, { skipCalculation: true });
             });
 
-            test('should not have aggregates if we call with skipCalculation', () =>
+            test('should have default values if we call with skipCalculation', () =>
             {
-               assert.deepEqual(Object.keys(reportsOnly), ['reports']);
+               assert.lengthOf(reportsOnly.reports, 2);
+               assert.strictEqual(reportsOnly.loc, 0);
+               assert.strictEqual(reportsOnly.maintainability, 0);
+               assert.strictEqual(reportsOnly.coreSize, 0);
+               assert.isUndefined(reportsOnly.adjacencyList);
+               assert.isUndefined(reportsOnly.visibilityList);
             });
 
-            test('should not have coreSize or visibilityMatrix if we call with noCoreSize', () =>
+            test('should have default coreSize and visibilityMatrix if we call with noCoreSize', () =>
             {
                const results = escomplexProject.analyze(modules, { noCoreSize: true });
-               assert.notOk(results.coreSize);
-               assert.notOk(results.visibilityMatrix);
+
+               assert.strictEqual(results.coreSize, 0);
+               assert.isUndefined(results.visibilityList);
+
                // make sure we still have a few things though
-               assert.ok(results.adjacencyMatrix);
+               assert.ok(results.adjacencyList);
                assert.ok(results.loc);
             });
 
@@ -547,41 +601,296 @@ if (testconfig.modules['project'])
             {
                const fullReport = escomplexProject.analyze(modules);
                const calcReport = escomplexProject.processResults(reportsOnly);
+
                assert.deepEqual(calcReport, fullReport);
             });
 
             test('should be able to run processResults without calculating coreSize', () =>
             {
                const results = escomplexProject.processResults(reportsOnly, { noCoreSize: true });
-               assert.notOk(results.coreSize);
-               assert.notOk(results.visibilityMatrix);
+               assert.strictEqual(results.coreSize, 0);
+               assert.isUndefined(results.visibilityList);
+
                // make sure we still have a few things though
-               assert.ok(results.adjacencyMatrix);
+               assert.ok(results.adjacencyList);
                assert.ok(results.loc);
             });
 
-            test('should be able to run processResultsThen', () =>
+            test('should be able to run processResultsAsync', () =>
             {
                const fullReport = escomplexProject.analyze(modules);
 
-               escomplexProject.processResultsThen(reportsOnly).then((calcReport) =>
+               escomplexProject.processResultsAsync(reportsOnly).then((calcReport) =>
                {
                   assert.deepEqual(calcReport, fullReport);
                });
             });
          });
 
-         suite('modules with dependencies:', () =>
+         suite('local source + NPM module typhonjs-escomplex-commons test w/ serializeReports false:', () =>
+         {
+            let result;
+
+            setup(() =>
+            {
+               result = escomplexProject.analyze(s_LOCAL_TEST_DATA, { serializeReports: false });
+            });
+
+            teardown(() =>
+            {
+               result = undefined;
+            });
+
+            test('reports are in correct order', () =>
+            {
+               assert.strictEqual(result.reports[0].filePath, './src/ESComplexProject.js');
+               assert.strictEqual(result.reports[1].filePath, './src/index.js');
+               assert.strictEqual(result.reports[2].filePath, './src/Plugins.js');
+               assert.strictEqual(result.reports[3].filePath, './node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
+               assert.strictEqual(result.reports[4].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
+               assert.strictEqual(result.reports[5].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js');
+               assert.strictEqual(result.reports[6].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
+               assert.strictEqual(result.reports[7].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js');
+               assert.strictEqual(result.reports[8].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
+               assert.strictEqual(result.reports[9].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js');
+               assert.strictEqual(result.reports[10].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
+               assert.strictEqual(result.reports[11].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js');
+               assert.strictEqual(result.reports[12].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js');
+               assert.strictEqual(result.reports[13].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js');
+               assert.strictEqual(result.reports[14].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
+               assert.strictEqual(result.reports[15].filePath, './node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
+               assert.strictEqual(result.reports[16].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js');
+               assert.strictEqual(result.reports[17].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js');
+
+               assert.strictEqual(result.reports[0].srcPath, './src/ESComplexProject.js');
+               assert.strictEqual(result.reports[1].srcPath, './src/index.js');
+               assert.strictEqual(result.reports[2].srcPath, './src/Plugins.js');
+               assert.strictEqual(result.reports[3].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
+               assert.strictEqual(result.reports[4].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
+               assert.strictEqual(result.reports[5].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
+               assert.strictEqual(result.reports[6].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
+               assert.strictEqual(result.reports[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
+               assert.strictEqual(result.reports[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
+               assert.strictEqual(result.reports[9].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
+               assert.strictEqual(result.reports[10].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
+               assert.strictEqual(result.reports[11].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
+               assert.strictEqual(result.reports[12].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
+               assert.strictEqual(result.reports[13].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
+               assert.strictEqual(result.reports[14].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
+               assert.strictEqual(result.reports[15].srcPath, 'typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
+               assert.strictEqual(result.reports[16].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
+               assert.strictEqual(result.reports[17].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
+            });
+
+            test('reports only contains object hash / srcPath entries', () =>
+            {
+               const testString = '[{"filePath":"./src/ESComplexProject.js","srcPath":"./src/ESComplexProject.js"},{"filePath":"./src/index.js","srcPath":"./src/index.js"},{"filePath":"./src/Plugins.js","srcPath":"./src/Plugins.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js","srcPath":"typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/AbstractReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ClassReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js","srcPath":"typhonjs-escomplex-commons/src/module/report/HalsteadData.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/MethodReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ModuleReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/actualize.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeName.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/Trait.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js","srcPath":"typhonjs-escomplex-commons/src/project/result/ProjectResult.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/MathUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/StringUtil.js"}]';
+
+               assert.strictEqual(JSON.stringify(result.reports), testString);
+            });
+         });
+
+         suite('local source + NPM module typhonjs-escomplex-commons test w/ dependencies:', () =>
+         {
+            let result;
+
+            setup(() =>
+            {
+               result = escomplexProject.analyze(s_LOCAL_TEST_DATA);
+            });
+
+            teardown(() =>
+            {
+               result = undefined;
+            });
+
+            test('reports are in correct order', () =>
+            {
+               assert.strictEqual(result.reports[0].srcPath, './src/ESComplexProject.js');
+               assert.strictEqual(result.reports[1].srcPath, './src/index.js');
+               assert.strictEqual(result.reports[2].srcPath, './src/Plugins.js');
+               assert.strictEqual(result.reports[3].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
+               assert.strictEqual(result.reports[4].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
+               assert.strictEqual(result.reports[5].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
+               assert.strictEqual(result.reports[6].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
+               assert.strictEqual(result.reports[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
+               assert.strictEqual(result.reports[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
+               assert.strictEqual(result.reports[9].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
+               assert.strictEqual(result.reports[10].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
+               assert.strictEqual(result.reports[11].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
+               assert.strictEqual(result.reports[12].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
+               assert.strictEqual(result.reports[13].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
+               assert.strictEqual(result.reports[14].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
+               assert.strictEqual(result.reports[15].srcPath, 'typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
+               assert.strictEqual(result.reports[16].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
+               assert.strictEqual(result.reports[17].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
+            });
+
+            test('adjacency list is correct', () =>
+            {
+               const testString = '[[2,8,15],[0],[],[],[],[4,7],[],[4,6],[4,5,7],[10,11,13],[14],[],[],[],[],[8,17],[],[]]';
+
+               assert.strictEqual(JSON.stringify(result.adjacencyList), testString);
+            });
+
+            test('visibility list is correct', () =>
+            {
+               const testString = '[[0,2,4,5,6,7,8,15,17],[0,1,2,4,5,6,7,8,15,17],[2],[3],[4],[4,5,6,7],[6],[4,6,7],[4,5,6,7,8],[9,10,11,13,14],[10,14],[11],[12],[13],[14],[4,5,6,7,8,15,17],[16],[17]]';
+
+               assert.strictEqual(JSON.stringify(result.visibilityList), testString);
+            });
+
+            test('toStringAdjacency', () =>
+            {
+               const testString = '0:\t./src/ESComplexProject.js\n\t2:\t./src/Plugins.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\n1:\t./src/index.js\n\t0:\t./src/ESComplexProject.js\n\n2:\t./src/Plugins.js\n\n3:\ttyphonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js\n\n4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\n5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\n7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\n8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n9:\ttyphonjs-escomplex-commons/src/module/traits/actualize.js\n\t10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\t13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\n10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\n12:\ttyphonjs-escomplex-commons/src/module/traits/safeName.js\n\n13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\n14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n16:\ttyphonjs-escomplex-commons/src/utils/MathUtil.js\n\n17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n';
+
+               assert.strictEqual(result.toStringAdjacency(), testString);
+            });
+
+            test('toStringVisibility', () =>
+            {
+               const testString = '0:\t./src/ESComplexProject.js\n\t0:\t./src/ESComplexProject.js\n\t2:\t./src/Plugins.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n1:\t./src/index.js\n\t0:\t./src/ESComplexProject.js\n\t1:\t./src/index.js\n\t2:\t./src/Plugins.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n2:\t./src/Plugins.js\n\t2:\t./src/Plugins.js\n\n3:\ttyphonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js\n\t3:\ttyphonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js\n\n4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\n5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\n7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\n9:\ttyphonjs-escomplex-commons/src/module/traits/actualize.js\n\t9:\ttyphonjs-escomplex-commons/src/module/traits/actualize.js\n\t10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\t13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\t14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\t11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\n12:\ttyphonjs-escomplex-commons/src/module/traits/safeName.js\n\t12:\ttyphonjs-escomplex-commons/src/module/traits/safeName.js\n\n13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\t13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\n14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\t14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n16:\ttyphonjs-escomplex-commons/src/utils/MathUtil.js\n\t16:\ttyphonjs-escomplex-commons/src/utils/MathUtil.js\n\n17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n';
+
+               assert.strictEqual(result.toStringVisibility(), testString);
+            });
+         });
+
+         suite('cjs modules with dependencies:', () =>
          {
             let result;
 
             setup(() =>
             {
                result = escomplexProject.analyze([
-                  { ast: Parser.parse('require("./a");"d";'), path: '/d.js' },
-                  { ast: Parser.parse('require("./b");"c";'), path: '/a/c.js' },
-                  { ast: Parser.parse('require("./c");"b";'), path: '/a/b.js' },
-                  { ast: Parser.parse('require("./a/b");require("./a/c");"a";'), path: '/a.js' }
+                  { ast: Parser.parse('require("./a");'), srcPath: '/d.js' },
+                  { ast: Parser.parse('require("./b");'), srcPath: '/a/c.js' },
+                  { ast: Parser.parse('require("./c");'), srcPath: '/a/b.js' },
+                  { ast: Parser.parse('require("./a/b");require("./a/c");'), srcPath: '/a.js' }
+               ], { commonjs: true });
+            });
+
+            teardown(() =>
+            {
+               result = undefined;
+            });
+
+            test('reports are in correct order', () =>
+            {
+               assert.strictEqual(result.reports[0].srcPath, '/a.js');
+               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.reports[2].srcPath, '/a/c.js');
+               assert.strictEqual(result.reports[3].srcPath, '/d.js');
+            });
+
+            test('adjacency list is correct', () =>
+            {
+               const testString = '[[1,2],[2],[1],[0]]';
+
+               assert.strictEqual(JSON.stringify(result.adjacencyList), testString);
+            });
+
+            test('visibility list is correct', () =>
+            {
+               const testString = '[[0,1,2],[1,2],[1,2],[0,1,2,3]]';
+
+               assert.strictEqual(JSON.stringify(result.visibilityList), testString);
+            });
+
+            test('first order density is correct', () =>
+            {
+               assert.strictEqual(result.firstOrderDensity, 31.25);
+            });
+
+            test('change cost is correct', () =>
+            {
+               assert.strictEqual(result.changeCost, 68.75);
+            });
+
+            test('core size is correct', () =>
+            {
+               assert.strictEqual(result.coreSize, 0);
+            });
+         });
+
+         suite('cjs modules with dynamic dependencies:', () =>
+         {
+            let result;
+
+            setup(() =>
+            {
+               result = escomplexProject.analyze([
+                  { ast: Parser.parse('require("dynamic_a");'), srcPath: '/d.js' },
+                  { ast: Parser.parse('require("dynamic_b");'), srcPath: '/a/c.js' },
+                  { ast: Parser.parse('require("dynamic_c");'), srcPath: '/a/b.js' },
+                  { ast: Parser.parse('require("./a/b");require("./a/c");'), srcPath: '/a.js' }
+               ],
+               { commonjs: true, dependencyResolver: (dependency) =>
+                  {
+                     switch (dependency)
+                     {
+                        case 'dynamic_a': return './a';
+                        case 'dynamic_b': return './b';
+                        case 'dynamic_c': return './c';
+                        default: return dependency;
+                     }
+                  }
+               });
+            });
+
+            teardown(() =>
+            {
+               result = undefined;
+            });
+
+            test('reports are in correct order', () =>
+            {
+               assert.strictEqual(result.reports[0].srcPath, '/a.js');
+               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.reports[2].srcPath, '/a/c.js');
+               assert.strictEqual(result.reports[3].srcPath, '/d.js');
+            });
+
+            test('adjacency list is correct', () =>
+            {
+               const testString = '[[1,2],[2],[1],[0]]';
+
+               assert.strictEqual(JSON.stringify(result.adjacencyList), testString);
+            });
+
+            test('visibility list is correct', () =>
+            {
+               const testString = '[[0,1,2],[1,2],[1,2],[0,1,2,3]]';
+
+               assert.strictEqual(JSON.stringify(result.visibilityList), testString);
+            });
+
+            test('first order density is correct', () =>
+            {
+               assert.strictEqual(result.firstOrderDensity, 31.25);
+            });
+
+            test('change cost is correct', () =>
+            {
+               assert.strictEqual(result.changeCost, 68.75);
+            });
+
+            test('core size is correct', () =>
+            {
+               assert.strictEqual(result.coreSize, 0);
+            });
+         });
+
+         suite('esm modules with dependencies:', () =>
+         {
+            let result;
+
+            setup(() =>
+            {
+               result = escomplexProject.analyze([
+                  { ast: Parser.parse('import d from "./a";'), srcPath: '/d.js' },
+                  { ast: Parser.parse('import c from "./b";'), srcPath: '/a/c.js' },
+                  { ast: Parser.parse('import b from "./c";'), srcPath: '/a/b.js' },
+                  { ast: Parser.parse('import a from "./a/b"; import aa from "./a/c";'), srcPath: '/a.js' }
                ]);
             });
 
@@ -592,39 +901,93 @@ if (testconfig.modules['project'])
 
             test('reports are in correct order', () =>
             {
-               assert.strictEqual(result.reports[0].path, '/a.js');
-               assert.strictEqual(result.reports[1].path, '/d.js');
-               assert.strictEqual(result.reports[2].path, '/a/b.js');
-               assert.strictEqual(result.reports[3].path, '/a/c.js');
+               assert.strictEqual(result.reports[0].srcPath, '/a.js');
+               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.reports[2].srcPath, '/a/c.js');
+               assert.strictEqual(result.reports[3].srcPath, '/d.js');
             });
 
-            test('adjacency matrix is correct', () =>
+            test('adjacency list is correct', () =>
             {
-               assert.lengthOf(result.adjacencyMatrix, 4);
+               const testString = '[[1,2],[2],[1],[0]]';
 
-               assert.lengthOf(result.adjacencyMatrix[0], 4);
-               assert.strictEqual(result.adjacencyMatrix[0][0], 0);
-               assert.strictEqual(result.adjacencyMatrix[0][1], 0);
-               assert.strictEqual(result.adjacencyMatrix[0][2], 1);
-               assert.strictEqual(result.adjacencyMatrix[0][3], 1);
+               assert.strictEqual(JSON.stringify(result.adjacencyList), testString);
+            });
 
-               assert.lengthOf(result.adjacencyMatrix[1], 4);
-               assert.strictEqual(result.adjacencyMatrix[1][0], 1);
-               assert.strictEqual(result.adjacencyMatrix[1][1], 0);
-               assert.strictEqual(result.adjacencyMatrix[1][2], 0);
-               assert.strictEqual(result.adjacencyMatrix[1][3], 0);
+            test('visibility list is correct', () =>
+            {
+               const testString = '[[0,1,2],[1,2],[1,2],[0,1,2,3]]';
 
-               assert.lengthOf(result.adjacencyMatrix[2], 4);
-               assert.strictEqual(result.adjacencyMatrix[2][0], 0);
-               assert.strictEqual(result.adjacencyMatrix[2][1], 0);
-               assert.strictEqual(result.adjacencyMatrix[2][2], 0);
-               assert.strictEqual(result.adjacencyMatrix[2][3], 1);
+               assert.strictEqual(JSON.stringify(result.visibilityList), testString);
+            });
 
-               assert.lengthOf(result.adjacencyMatrix[3], 4);
-               assert.strictEqual(result.adjacencyMatrix[3][0], 0);
-               assert.strictEqual(result.adjacencyMatrix[3][1], 0);
-               assert.strictEqual(result.adjacencyMatrix[3][2], 1);
-               assert.strictEqual(result.adjacencyMatrix[3][3], 0);
+            test('first order density is correct', () =>
+            {
+               assert.strictEqual(result.firstOrderDensity, 31.25);
+            });
+
+            test('change cost is correct', () =>
+            {
+               assert.strictEqual(result.changeCost, 68.75);
+            });
+
+            test('core size is correct', () =>
+            {
+               assert.strictEqual(result.coreSize, 0);
+            });
+         });
+
+         suite('esm modules with dynamic dependencies:', () =>
+         {
+            let result;
+
+            setup(() =>
+            {
+               result = escomplexProject.analyze([
+                  { ast: Parser.parse('import d from "dynamic_a";'), srcPath: '/d.js' },
+                  { ast: Parser.parse('import c from "dynamic_b";'), srcPath: '/a/c.js' },
+                  { ast: Parser.parse('import b from "dynamic_c";'), srcPath: '/a/b.js' },
+                  { ast: Parser.parse('import a from "./a/b"; import aa from "./a/c";'), srcPath: '/a.js' }
+               ],
+               {
+                  dependencyResolver: (dependency) =>
+                  {
+                     switch (dependency)
+                     {
+                        case 'dynamic_a': return './a';
+                        case 'dynamic_b': return './b';
+                        case 'dynamic_c': return './c';
+                        default: return dependency;
+                     }
+                  }
+               });
+            });
+
+            teardown(() =>
+            {
+               result = undefined;
+            });
+
+            test('reports are in correct order', () =>
+            {
+               assert.strictEqual(result.reports[0].srcPath, '/a.js');
+               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.reports[2].srcPath, '/a/c.js');
+               assert.strictEqual(result.reports[3].srcPath, '/d.js');
+            });
+
+            test('adjacency list is correct', () =>
+            {
+               const testString = '[[1,2],[2],[1],[0]]';
+
+               assert.strictEqual(JSON.stringify(result.adjacencyList), testString);
+            });
+
+            test('visibility list is correct', () =>
+            {
+               const testString = '[[0,1,2],[1,2],[1,2],[0,1,2,3]]';
+
+               assert.strictEqual(JSON.stringify(result.visibilityList), testString);
             });
 
             test('first order density is correct', () =>
@@ -650,13 +1013,13 @@ if (testconfig.modules['project'])
             setup(() =>
             {
                result = escomplexProject.analyze([
-                  { ast: Parser.parse('"f";'), path: '/a/c/f.js' },
-                  { ast: Parser.parse('require("./f");"e";'), path: '/a/c/e.js' },
-                  { ast: Parser.parse('"d";'), path: '/a/b/d.js' },
-                  { ast: Parser.parse('require("./c/e");"c";'), path: '/a/c.js' },
-                  { ast: Parser.parse('require("./b/d");"b";'), path: '/a/b.js' },
-                  { ast: Parser.parse('require("./a/b");require("./a/c");"a";'), path: '/a.js' }
-               ]);
+                  { ast: Parser.parse('"f";'), srcPath: '/a/c/f.js' },
+                  { ast: Parser.parse('require("./f");"e";'), srcPath: '/a/c/e.js' },
+                  { ast: Parser.parse('"d";'), srcPath: '/a/b/d.js' },
+                  { ast: Parser.parse('require("./c/e");"c";'), srcPath: '/a/c.js' },
+                  { ast: Parser.parse('require("./b/d");"b";'), srcPath: '/a/b.js' },
+                  { ast: Parser.parse('require("./a/b");require("./a/c");"a";'), srcPath: '/a.js' }
+               ], { commonjs: true });
             });
 
             teardown(() =>
@@ -666,65 +1029,26 @@ if (testconfig.modules['project'])
 
             test('reports are in correct order', () =>
             {
-               assert.strictEqual(result.reports[0].path, '/a.js');
-               assert.strictEqual(result.reports[1].path, '/a/b.js');
-               assert.strictEqual(result.reports[2].path, '/a/c.js');
-               assert.strictEqual(result.reports[3].path, '/a/b/d.js');
-               assert.strictEqual(result.reports[4].path, '/a/c/e.js');
-               assert.strictEqual(result.reports[5].path, '/a/c/f.js');
+               assert.strictEqual(result.reports[0].srcPath, '/a.js');
+               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.reports[2].srcPath, '/a/b/d.js');
+               assert.strictEqual(result.reports[3].srcPath, '/a/c.js');
+               assert.strictEqual(result.reports[4].srcPath, '/a/c/e.js');
+               assert.strictEqual(result.reports[5].srcPath, '/a/c/f.js');
             });
 
-            test('adjacency matrix is correct', () =>
+            test('adjacency list is correct', () =>
             {
-               assert.lengthOf(result.adjacencyMatrix, 6);
+               const testString = '[[1,3],[2],[],[4],[5],[]]';
 
-               assert.lengthOf(result.adjacencyMatrix[0], 6);
-               assert.strictEqual(result.adjacencyMatrix[0][0], 0);
-               assert.strictEqual(result.adjacencyMatrix[0][1], 1);
-               assert.strictEqual(result.adjacencyMatrix[0][2], 1);
-               assert.strictEqual(result.adjacencyMatrix[0][3], 0);
-               assert.strictEqual(result.adjacencyMatrix[0][4], 0);
-               assert.strictEqual(result.adjacencyMatrix[0][5], 0);
+               assert.strictEqual(JSON.stringify(result.adjacencyList), testString);
+            });
 
-               assert.lengthOf(result.adjacencyMatrix[1], 6);
-               assert.strictEqual(result.adjacencyMatrix[1][0], 0);
-               assert.strictEqual(result.adjacencyMatrix[1][1], 0);
-               assert.strictEqual(result.adjacencyMatrix[1][2], 0);
-               assert.strictEqual(result.adjacencyMatrix[1][3], 1);
-               assert.strictEqual(result.adjacencyMatrix[1][4], 0);
-               assert.strictEqual(result.adjacencyMatrix[1][5], 0);
+            test('visibility list is correct', () =>
+            {
+               const testString = '[[0,1,2,3,4,5],[1,2],[2],[3,4,5],[4,5],[5]]';
 
-               assert.lengthOf(result.adjacencyMatrix[2], 6);
-               assert.strictEqual(result.adjacencyMatrix[2][0], 0);
-               assert.strictEqual(result.adjacencyMatrix[2][1], 0);
-               assert.strictEqual(result.adjacencyMatrix[2][2], 0);
-               assert.strictEqual(result.adjacencyMatrix[2][3], 0);
-               assert.strictEqual(result.adjacencyMatrix[2][4], 1);
-               assert.strictEqual(result.adjacencyMatrix[2][5], 0);
-
-               assert.lengthOf(result.adjacencyMatrix[3], 6);
-               assert.strictEqual(result.adjacencyMatrix[3][0], 0);
-               assert.strictEqual(result.adjacencyMatrix[3][1], 0);
-               assert.strictEqual(result.adjacencyMatrix[3][2], 0);
-               assert.strictEqual(result.adjacencyMatrix[3][3], 0);
-               assert.strictEqual(result.adjacencyMatrix[3][4], 0);
-               assert.strictEqual(result.adjacencyMatrix[3][5], 0);
-
-               assert.lengthOf(result.adjacencyMatrix[4], 6);
-               assert.strictEqual(result.adjacencyMatrix[4][0], 0);
-               assert.strictEqual(result.adjacencyMatrix[4][1], 0);
-               assert.strictEqual(result.adjacencyMatrix[4][2], 0);
-               assert.strictEqual(result.adjacencyMatrix[4][3], 0);
-               assert.strictEqual(result.adjacencyMatrix[4][4], 0);
-               assert.strictEqual(result.adjacencyMatrix[4][5], 1);
-
-               assert.lengthOf(result.adjacencyMatrix[5], 6);
-               assert.strictEqual(result.adjacencyMatrix[5][0], 0);
-               assert.strictEqual(result.adjacencyMatrix[5][1], 0);
-               assert.strictEqual(result.adjacencyMatrix[5][2], 0);
-               assert.strictEqual(result.adjacencyMatrix[5][3], 0);
-               assert.strictEqual(result.adjacencyMatrix[5][4], 0);
-               assert.strictEqual(result.adjacencyMatrix[5][5], 0);
+               assert.strictEqual(JSON.stringify(result.visibilityList), testString);
             });
 
             test('first order density is correct', () =>
@@ -746,18 +1070,27 @@ if (testconfig.modules['project'])
             });
          });
 
-         suite('large project calculation performance and accuracy', () =>
+         suite('large project calculation performance', () =>
          {
-            let resultFixture;
-            setup(() =>
+            const resultFixture = require('../fixture/large_report');
+            const resultSkipCalc = escomplexProject.analyze(s_LOCAL_TEST_DATA, { skipCalculation: true });
+
+            test('deserialize JSON object should be sufficiently fast', function()
             {
-               resultFixture = require('../fixture/ast_moz');
+               this.timeout(40);
+               ProjectResult.parse(resultFixture);
             });
 
-            test('running calculations should be sufficently fast', function()
+            test('running calculations should be sufficiently fast', function()
             {
-               this.timeout(50);
-               escomplexProject.processResults(resultFixture);
+               this.timeout(40);
+               escomplexProject.processResults(resultSkipCalc);
+            });
+
+            test('running analyze should be sufficiently fast', function()
+            {
+               this.timeout(100);
+               escomplexProject.analyze(s_LOCAL_TEST_DATA);
             });
          });
       });

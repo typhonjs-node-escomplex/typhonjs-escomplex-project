@@ -1,5 +1,3 @@
-'use strict';
-
 import * as acorn       from 'acorn';
 import * as babylon     from 'babylon';
 import * as espree      from 'espree';

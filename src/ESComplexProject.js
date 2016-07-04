@@ -1,6 +1,7 @@
-'use strict';
-
 import ESComplexModule  from 'typhonjs-escomplex-module/src/ESComplexModule';
+
+import ModuleReport     from 'typhonjs-escomplex-commons/src/module/report/ModuleReport';
+import ProjectResult    from 'typhonjs-escomplex-commons/src/project/result/ProjectResult';
 
 import Plugins          from './Plugins';
 
@@ -12,6 +13,21 @@ export default class ESComplexProject
    /**
     * Initializes ESComplexProject.
     *
+    * @param {object}   pathModule - Provides an object which matches the Node path module. In particular the following
+    *                                entries must be provided:
+    * ```
+    * (string)    sep - Provides the platform-specific path segment separator: `/` on POSIX & `\` on Windows.
+    *
+    * (function)  dirname - Returns the directory name of a path, similar to the Unix dirname command.
+    *
+    * (function)  extname - Returns the extension of the path, from the last occurance of the . (period) character to
+    *                       end of string in the last portion of the path.
+    *
+    * (function)  relative - Returns the relative path from from to to.
+    *
+    * (function)  resolve - Resolves a sequence of paths or path segments into an absolute path.
+    * ```
+    *
     * @param {object}   options - module and project options including user plugins to load including:
     * ```
     * (object)             module - Provides an object hash of the following options for the module runtime:
@@ -22,10 +38,42 @@ export default class ESComplexProject
     *    (boolean)         loadDefaultPlugins - When false ESComplexProject will not load any default plugins.
     *    (Array<Object>)   plugins - A list of ESComplexProject plugins that have already been instantiated.
     * ```
+    *
+    * @see https://nodejs.org/api/path.html
     */
-   constructor(options = {})
+   constructor(pathModule, options = {})
    {
+      // Verify essential Node path module API.
+      if (typeof pathModule !== 'object') { throw new TypeError('ctor error: `pathModule` is not an `object`.'); }
+
+      if (typeof pathModule.sep !== 'string')
+      {
+         throw new TypeError('ctor error: `pathModule.sep` is not a `string`.');
+      }
+
+      if (typeof pathModule.dirname !== 'function')
+      {
+         throw new TypeError('ctor error: `pathModule.dirname` is not a `function`.');
+      }
+
+      if (typeof pathModule.extname !== 'function')
+      {
+         throw new TypeError('ctor error: `pathModule.extname` is not a `function`.');
+      }
+
+      if (typeof pathModule.relative !== 'function')
+      {
+         throw new TypeError('ctor error: `pathModule.relative` is not a `function`.');
+      }
+
+      if (typeof pathModule.resolve !== 'function')
+      {
+         throw new TypeError('ctor error: `pathModule.resolve` is not a `function`.');
+      }
+
       if (typeof options !== 'object') { throw new TypeError('ctor error: `options` is not an `object`.'); }
+
+      this._pathModule = pathModule;
 
       this._plugins = new Plugins(options.project);
 
@@ -35,10 +83,12 @@ export default class ESComplexProject
    /**
     * Processes the given modules and calculates project metrics via plugins.
     *
-    * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
-    * @param {object}   options - (Optional) project processing options.
+    * @param {Array<object>}  modules - Array of object hashes containing `ast` and `srcPath` entries. Optionally
+    *                                   `srcPathAlias` and `filePath` entries may also be provided.
     *
-    * @returns {{reports: Array<{}>}}
+    * @param {object}         options - (Optional) project processing options.
+    *
+    * @returns {ProjectResult}
     */
    analyze(modules, options = {})
    {
@@ -47,56 +97,75 @@ export default class ESComplexProject
 
       const settings = this._plugins.onConfigure(options);
 
-      this._plugins.onProjectStart(settings);
+      this._plugins.onProjectStart(this._pathModule, settings);
 
       const reports = modules.map((m) =>
       {
          let report;
 
-         if (m.path === '') { throw new Error('analyze error: Invalid path'); }
+         if (m.srcPath === '') { throw new Error('analyze error: Invalid `srcPath`'); }
 
          try
          {
             report = this._escomplexModule.analyze(m.ast, options);
-            report.path = m.path;
+
+            // Set any supplied filePath / srcPath data.
+            report.filePath = m.filePath;
+            report.srcPath = m.srcPath;
+
             return report;
          }
          catch (error)
          {
-            // Include the module path to distinguish the actual offending entry.
-            error.message = `${m.path}: ${error.message}`;
+            // Include the module srcPath to distinguish the actual offending entry.
+            error.message = `${m.srcPath}: ${error.message}`;
             throw error;
          }
       }, []);
 
-      const results = { reports };
+      const results = new ProjectResult(reports, settings);
 
       if (settings.skipCalculation) { return results; }
 
-      this._plugins.onProjectEnd(results);
+      this._plugins.onProjectEnd(this._pathModule, results);
 
-      return results;
+      return results.finalize();
    }
 
    /**
     * Processes existing project results and calculates metrics via plugins.
     *
-    * @param {object}   results - An object hash with a `reports` entry that is an Array of module results.
-    * @param {object}   options - (Optional) project processing options.
+    * @param {ProjectResult}  results - An instance of ProjectResult with a `reports` entry that is an Array of
+    *                                   ModuleReports.
     *
-    * @returns {{reports: Array<{}>}}
+    * @param {object}         options - (Optional) project processing options.
+    *
+    * @returns {ProjectResult}
     */
    processResults(results, options = {})
    {
-      if (typeof results !== 'object') { throw new TypeError('processResults error: `results` is not an `object`.'); }
+      if (!(results instanceof ProjectResult))
+      {
+         throw new TypeError('processResults error: `results` is not an instance of ProjectResult.');
+      }
+
       if (typeof options !== 'object') { throw new TypeError('processResults error: `options` is not an `object`.'); }
+
+      if (results.reports.length > 0 && !(results.reports[0] instanceof ModuleReport))
+      {
+         throw new TypeError(
+          'processResults error: `results.reports` does not appear to contain `ModuleReport` entries.');
+      }
 
       const settings = this._plugins.onConfigure(options);
 
-      this._plugins.onProjectStart(settings);
-      this._plugins.onProjectEnd(results);
+      // Override any stored settings given new options / settings set during processing reports.
+      results.settings = settings;
 
-      return results;
+      this._plugins.onProjectStart(this._pathModule, settings);
+      this._plugins.onProjectEnd(this._pathModule, results);
+
+      return results.finalize();
    }
 
    // Asynchronous Promise based methods ----------------------------------------------------------------------------
@@ -104,12 +173,14 @@ export default class ESComplexProject
    /**
     * Wraps in a Promise processing the given modules and calculates metrics via plugins.
     *
-    * @param {Array}    modules - Array of object hashes containing `ast` and `path` entries.
-    * @param {object}   options - project processing options
+    * @param {Array<object>}  modules - Array of object hashes containing `ast` and `srcPath` entries. Optionally
+    *                                   `srcPathAlias` and `filePath` entries may also be provided.
     *
-    * @returns {Promise<{reports: Array<{}>}>}
+    * @param {object}         options - project processing options
+    *
+    * @returns {Promise<ProjectResult>}
     */
-   analyzeThen(modules, options = {})
+   analyzeAsync(modules, options = {})
    {
       return new Promise((resolve, reject) =>
       {
@@ -124,9 +195,9 @@ export default class ESComplexProject
     * @param {object}   results - An object hash with a `reports` entry that is an Array of module results.
     * @param {object}   options - (Optional) project processing options.
     *
-    * @returns {Promise<{reports: Array<{}>}>}
+    * @returns {Promise<ProjectResult>}
     */
-   processResultsThen(results, options = {})
+   processResultsAsync(results, options = {})
    {
       return new Promise((resolve, reject) =>
       {
