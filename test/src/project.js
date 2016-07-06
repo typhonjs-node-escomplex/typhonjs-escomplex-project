@@ -131,6 +131,22 @@ if (testconfig.modules['project'])
             });
          });
 
+         test('analyzeAsync throws when modules is not an array', () =>
+         {
+            assert.throws(() =>
+            {
+               escomplexProject.analyze({});
+            });
+         });
+
+         test('analyze throws when `srcPath` is missing', () =>
+         {
+            assert.throws(() =>
+            {
+               escomplexProject.analyze([{ ast: Parser.parse('if (true) { "foo"; } else { "bar"; }') }]);
+            });
+         });
+
          suite('no modules:', () =>
          {
             let result;

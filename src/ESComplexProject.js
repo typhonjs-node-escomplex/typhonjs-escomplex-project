@@ -44,33 +44,40 @@ export default class ESComplexProject
    constructor(pathModule, options = {})
    {
       // Verify essential Node path module API.
+      /* istanbul ignore if */
       if (typeof pathModule !== 'object') { throw new TypeError('ctor error: `pathModule` is not an `object`.'); }
 
+      /* istanbul ignore if */
       if (typeof pathModule.sep !== 'string')
       {
          throw new TypeError('ctor error: `pathModule.sep` is not a `string`.');
       }
 
+      /* istanbul ignore if */
       if (typeof pathModule.dirname !== 'function')
       {
          throw new TypeError('ctor error: `pathModule.dirname` is not a `function`.');
       }
 
+      /* istanbul ignore if */
       if (typeof pathModule.extname !== 'function')
       {
          throw new TypeError('ctor error: `pathModule.extname` is not a `function`.');
       }
 
+      /* istanbul ignore if */
       if (typeof pathModule.relative !== 'function')
       {
          throw new TypeError('ctor error: `pathModule.relative` is not a `function`.');
       }
 
+      /* istanbul ignore if */
       if (typeof pathModule.resolve !== 'function')
       {
          throw new TypeError('ctor error: `pathModule.resolve` is not a `function`.');
       }
 
+      /* istanbul ignore if */
       if (typeof options !== 'object') { throw new TypeError('ctor error: `options` is not an `object`.'); }
 
       this._pathModule = pathModule;
@@ -93,6 +100,8 @@ export default class ESComplexProject
    analyze(modules, options = {})
    {
       if (!Array.isArray(modules)) { throw new TypeError('analyze error: `modules` is not an `array`.'); }
+
+      /* istanbul ignore if */
       if (typeof options !== 'object') { throw new TypeError('analyze error: `options` is not an `object`.'); }
 
       const settings = this._plugins.onConfigure(options);
@@ -103,7 +112,7 @@ export default class ESComplexProject
       {
          let report;
 
-         if (m.srcPath === '') { throw new Error('analyze error: Invalid `srcPath`'); }
+         if (typeof m.srcPath !== 'string' || m.srcPath === '') { throw new Error('analyze error: Invalid `srcPath`'); }
 
          try
          {
@@ -119,7 +128,11 @@ export default class ESComplexProject
          catch (error)
          {
             // Include the module srcPath to distinguish the actual offending entry.
+
+            /* istanbul ignore next */
             error.message = `${m.srcPath}: ${error.message}`;
+
+            /* istanbul ignore next */
             throw error;
          }
       }, []);
@@ -145,13 +158,16 @@ export default class ESComplexProject
     */
    processResults(results, options = {})
    {
+      /* istanbul ignore if */
       if (!(results instanceof ProjectResult))
       {
          throw new TypeError('processResults error: `results` is not an instance of ProjectResult.');
       }
 
+      /* istanbul ignore if */
       if (typeof options !== 'object') { throw new TypeError('processResults error: `options` is not an `object`.'); }
 
+      /* istanbul ignore if */
       if (results.reports.length > 0 && !(results.reports[0] instanceof ModuleReport))
       {
          throw new TypeError(
@@ -186,7 +202,7 @@ export default class ESComplexProject
       return new Promise((resolve, reject) =>
       {
          try { resolve(this.analyze(modules, options)); }
-         catch (err) { reject(err); }
+         catch (err) { /* istanbul ignore next */ reject(err); }
       });
    }
 
@@ -203,7 +219,7 @@ export default class ESComplexProject
       return new Promise((resolve, reject) =>
       {
          try { resolve(this.processResults(results, options)); }
-         catch (err) { reject(err); }
+         catch (err) { /* istanbul ignore next */ reject(err); }
       });
    }
 }
