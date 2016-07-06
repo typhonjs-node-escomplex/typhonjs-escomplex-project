@@ -109,9 +109,10 @@ export default class ESComplexProject
          {
             report = this._escomplexModule.analyze(m.ast, options);
 
-            // Set any supplied filePath / srcPath data.
+            // Set any supplied filePath / srcPath / srcPathAlias data.
             report.filePath = m.filePath;
             report.srcPath = m.srcPath;
+            report.srcPathAlias = m.srcPathAlias;
 
             return report;
          }

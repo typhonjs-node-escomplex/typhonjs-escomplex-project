@@ -15,10 +15,10 @@ export const modules =
  */
 export const parsers =
 {
-   acorn: false,
+   acorn: true,
    babylon: true,
-   espree: false,
-   esprima: false
+   espree: true,
+   esprima: true
 };
 
 /**

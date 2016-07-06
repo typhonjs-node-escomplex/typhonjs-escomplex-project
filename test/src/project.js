@@ -17,6 +17,10 @@ if (testconfig.modules['project'])
 
       const s_LOCAL_TEST_FILES =
       [
+         './node_modules/typhonjs-escomplex-module/src/ESComplexModule.js',
+         './node_modules/typhonjs-escomplex-module/src/index.js',
+         './node_modules/typhonjs-escomplex-module/src/Plugins.js',
+
          './node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js',
          './node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js',
          './node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js',
@@ -33,6 +37,9 @@ if (testconfig.modules['project'])
          './node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js',
          './node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js',
 
+         './test/fixture/testImportNPMAlias.js',
+         './test/fixture/testRequireNPMAlias.js',
+
          './src/ESComplexProject.js',
          './src/index.js',
          './src/Plugins.js'
@@ -41,6 +48,7 @@ if (testconfig.modules['project'])
       const s_LOCAL_TEST_DATA = s_LOCAL_TEST_FILES.map((filePath) =>
       {
          let srcPath = filePath;
+         let srcPathAlias = undefined;
 
          // Remove leading `./node_modules/` from file path for the source path which is what is referenced in the code.
          if (filePath.startsWith('./node_modules/'))
@@ -48,10 +56,17 @@ if (testconfig.modules['project'])
             srcPath = filePath.replace(/^\.\/node_modules\//, '');
          }
 
+         // Add srcPathAlias for typhonjs-escomplex-module NPM main alias.
+         if (filePath === './node_modules/typhonjs-escomplex-module/src/index.js')
+         {
+            srcPathAlias = 'typhonjs-escomplex-module';
+         }
+
          return {
             ast: Parser.parse(fs.readFileSync(filePath, 'utf8')),
             filePath,
-            srcPath
+            srcPath,
+            srcPathAlias
          };
       });
 
@@ -646,45 +661,57 @@ if (testconfig.modules['project'])
                assert.strictEqual(result.reports[0].filePath, './src/ESComplexProject.js');
                assert.strictEqual(result.reports[1].filePath, './src/index.js');
                assert.strictEqual(result.reports[2].filePath, './src/Plugins.js');
-               assert.strictEqual(result.reports[3].filePath, './node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
-               assert.strictEqual(result.reports[4].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
-               assert.strictEqual(result.reports[5].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js');
-               assert.strictEqual(result.reports[6].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
-               assert.strictEqual(result.reports[7].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js');
-               assert.strictEqual(result.reports[8].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
-               assert.strictEqual(result.reports[9].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js');
-               assert.strictEqual(result.reports[10].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
-               assert.strictEqual(result.reports[11].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js');
-               assert.strictEqual(result.reports[12].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js');
-               assert.strictEqual(result.reports[13].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js');
-               assert.strictEqual(result.reports[14].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
-               assert.strictEqual(result.reports[15].filePath, './node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
-               assert.strictEqual(result.reports[16].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js');
-               assert.strictEqual(result.reports[17].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js');
+               assert.strictEqual(result.reports[3].filePath, './test/fixture/testImportNPMAlias.js');
+               assert.strictEqual(result.reports[4].filePath, './test/fixture/testRequireNPMAlias.js');
+               assert.strictEqual(result.reports[5].filePath, './node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
+               assert.strictEqual(result.reports[6].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
+               assert.strictEqual(result.reports[7].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js');
+               assert.strictEqual(result.reports[8].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
+               assert.strictEqual(result.reports[9].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js');
+               assert.strictEqual(result.reports[10].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
+               assert.strictEqual(result.reports[11].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js');
+               assert.strictEqual(result.reports[12].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
+               assert.strictEqual(result.reports[13].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js');
+               assert.strictEqual(result.reports[14].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js');
+               assert.strictEqual(result.reports[15].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js');
+               assert.strictEqual(result.reports[16].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
+               assert.strictEqual(result.reports[17].filePath, './node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
+               assert.strictEqual(result.reports[18].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js');
+               assert.strictEqual(result.reports[19].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js');
+               assert.strictEqual(result.reports[20].filePath, './node_modules/typhonjs-escomplex-module/src/ESComplexModule.js');
+               assert.strictEqual(result.reports[21].filePath, './node_modules/typhonjs-escomplex-module/src/index.js');
+               assert.strictEqual(result.reports[22].filePath, './node_modules/typhonjs-escomplex-module/src/Plugins.js');
 
                assert.strictEqual(result.reports[0].srcPath, './src/ESComplexProject.js');
                assert.strictEqual(result.reports[1].srcPath, './src/index.js');
                assert.strictEqual(result.reports[2].srcPath, './src/Plugins.js');
-               assert.strictEqual(result.reports[3].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
-               assert.strictEqual(result.reports[4].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
-               assert.strictEqual(result.reports[5].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
-               assert.strictEqual(result.reports[6].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
-               assert.strictEqual(result.reports[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
-               assert.strictEqual(result.reports[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
-               assert.strictEqual(result.reports[9].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
-               assert.strictEqual(result.reports[10].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
-               assert.strictEqual(result.reports[11].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
-               assert.strictEqual(result.reports[12].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
-               assert.strictEqual(result.reports[13].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
-               assert.strictEqual(result.reports[14].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
-               assert.strictEqual(result.reports[15].srcPath, 'typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
-               assert.strictEqual(result.reports[16].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
-               assert.strictEqual(result.reports[17].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
+               assert.strictEqual(result.reports[3].srcPath, './test/fixture/testImportNPMAlias.js');
+               assert.strictEqual(result.reports[4].srcPath, './test/fixture/testRequireNPMAlias.js');
+               assert.strictEqual(result.reports[5].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
+               assert.strictEqual(result.reports[6].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
+               assert.strictEqual(result.reports[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
+               assert.strictEqual(result.reports[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
+               assert.strictEqual(result.reports[9].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
+               assert.strictEqual(result.reports[10].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
+               assert.strictEqual(result.reports[11].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
+               assert.strictEqual(result.reports[12].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
+               assert.strictEqual(result.reports[13].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
+               assert.strictEqual(result.reports[14].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
+               assert.strictEqual(result.reports[15].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
+               assert.strictEqual(result.reports[16].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
+               assert.strictEqual(result.reports[17].srcPath, 'typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
+               assert.strictEqual(result.reports[18].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
+               assert.strictEqual(result.reports[19].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
+               assert.strictEqual(result.reports[20].srcPath, 'typhonjs-escomplex-module/src/ESComplexModule.js');
+               assert.strictEqual(result.reports[21].srcPath, 'typhonjs-escomplex-module/src/index.js');
+               assert.strictEqual(result.reports[22].srcPath, 'typhonjs-escomplex-module/src/Plugins.js');
+
+               assert.strictEqual(result.reports[21].srcPathAlias, 'typhonjs-escomplex-module');
             });
 
             test('reports only contains object hash / srcPath entries', () =>
             {
-               const testString = '[{"filePath":"./src/ESComplexProject.js","srcPath":"./src/ESComplexProject.js"},{"filePath":"./src/index.js","srcPath":"./src/index.js"},{"filePath":"./src/Plugins.js","srcPath":"./src/Plugins.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js","srcPath":"typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/AbstractReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ClassReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js","srcPath":"typhonjs-escomplex-commons/src/module/report/HalsteadData.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/MethodReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ModuleReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/actualize.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeName.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/Trait.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js","srcPath":"typhonjs-escomplex-commons/src/project/result/ProjectResult.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/MathUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/StringUtil.js"}]';
+               const testString = '[{"filePath":"./src/ESComplexProject.js","srcPath":"./src/ESComplexProject.js"},{"filePath":"./src/index.js","srcPath":"./src/index.js"},{"filePath":"./src/Plugins.js","srcPath":"./src/Plugins.js"},{"filePath":"./test/fixture/testImportNPMAlias.js","srcPath":"./test/fixture/testImportNPMAlias.js"},{"filePath":"./test/fixture/testRequireNPMAlias.js","srcPath":"./test/fixture/testRequireNPMAlias.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js","srcPath":"typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/AbstractReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ClassReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js","srcPath":"typhonjs-escomplex-commons/src/module/report/HalsteadData.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/MethodReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ModuleReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/actualize.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeName.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/Trait.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js","srcPath":"typhonjs-escomplex-commons/src/project/result/ProjectResult.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/MathUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/StringUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-module/src/ESComplexModule.js","srcPath":"typhonjs-escomplex-module/src/ESComplexModule.js"},{"filePath":"./node_modules/typhonjs-escomplex-module/src/index.js","srcPath":"typhonjs-escomplex-module/src/index.js","srcPathAlias":"typhonjs-escomplex-module"},{"filePath":"./node_modules/typhonjs-escomplex-module/src/Plugins.js","srcPath":"typhonjs-escomplex-module/src/Plugins.js"}]';
 
                assert.strictEqual(JSON.stringify(result.reports), testString);
             });
@@ -696,7 +723,7 @@ if (testconfig.modules['project'])
 
             setup(() =>
             {
-               result = escomplexProject.analyze(s_LOCAL_TEST_DATA);
+               result = escomplexProject.analyze(s_LOCAL_TEST_DATA, { commonjs: true });
             });
 
             teardown(() =>
@@ -709,47 +736,52 @@ if (testconfig.modules['project'])
                assert.strictEqual(result.reports[0].srcPath, './src/ESComplexProject.js');
                assert.strictEqual(result.reports[1].srcPath, './src/index.js');
                assert.strictEqual(result.reports[2].srcPath, './src/Plugins.js');
-               assert.strictEqual(result.reports[3].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
-               assert.strictEqual(result.reports[4].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
-               assert.strictEqual(result.reports[5].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
-               assert.strictEqual(result.reports[6].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
-               assert.strictEqual(result.reports[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
-               assert.strictEqual(result.reports[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
-               assert.strictEqual(result.reports[9].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
-               assert.strictEqual(result.reports[10].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
-               assert.strictEqual(result.reports[11].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
-               assert.strictEqual(result.reports[12].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
-               assert.strictEqual(result.reports[13].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
-               assert.strictEqual(result.reports[14].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
-               assert.strictEqual(result.reports[15].srcPath, 'typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
-               assert.strictEqual(result.reports[16].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
-               assert.strictEqual(result.reports[17].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
+               assert.strictEqual(result.reports[3].srcPath, './test/fixture/testImportNPMAlias.js');
+               assert.strictEqual(result.reports[4].srcPath, './test/fixture/testRequireNPMAlias.js');
+               assert.strictEqual(result.reports[5].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
+               assert.strictEqual(result.reports[6].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
+               assert.strictEqual(result.reports[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
+               assert.strictEqual(result.reports[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
+               assert.strictEqual(result.reports[9].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
+               assert.strictEqual(result.reports[10].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
+               assert.strictEqual(result.reports[11].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
+               assert.strictEqual(result.reports[12].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
+               assert.strictEqual(result.reports[13].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
+               assert.strictEqual(result.reports[14].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
+               assert.strictEqual(result.reports[15].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
+               assert.strictEqual(result.reports[16].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
+               assert.strictEqual(result.reports[17].srcPath, 'typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
+               assert.strictEqual(result.reports[18].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
+               assert.strictEqual(result.reports[19].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
+               assert.strictEqual(result.reports[20].srcPath, 'typhonjs-escomplex-module/src/ESComplexModule.js');
+               assert.strictEqual(result.reports[21].srcPath, 'typhonjs-escomplex-module/src/index.js');
+               assert.strictEqual(result.reports[22].srcPath, 'typhonjs-escomplex-module/src/Plugins.js');
             });
 
             test('adjacency list is correct', () =>
             {
-               const testString = '[[2,8,15],[0],[],[],[],[4,7],[],[4,6],[4,5,7],[10,11,13],[14],[],[],[],[],[8,17],[],[]]';
+               const testString = '[[2,10,17,20],[0],[],[21],[21],[],[],[6,9],[],[6,8],[6,7,9],[12,13,15],[16],[],[],[],[],[10,19],[],[],[22],[20],[10]]';
 
                assert.strictEqual(JSON.stringify(result.adjacencyList), testString);
             });
 
             test('visibility list is correct', () =>
             {
-               const testString = '[[0,2,4,5,6,7,8,15,17],[0,1,2,4,5,6,7,8,15,17],[2],[3],[4],[4,5,6,7],[6],[4,6,7],[4,5,6,7,8],[9,10,11,13,14],[10,14],[11],[12],[13],[14],[4,5,6,7,8,15,17],[16],[17]]';
+               const testString = '[[0,2,6,7,8,9,10,17,19,20,22],[0,1,2,6,7,8,9,10,17,19,20,22],[2],[3,6,7,8,9,10,20,21,22],[4,6,7,8,9,10,20,21,22],[5],[6],[6,7,8,9],[8],[6,8,9],[6,7,8,9,10],[11,12,13,15,16],[12,16],[13],[14],[15],[16],[6,7,8,9,10,17,19],[18],[19],[6,7,8,9,10,20,22],[6,7,8,9,10,20,21,22],[6,7,8,9,10,22]]';
 
                assert.strictEqual(JSON.stringify(result.visibilityList), testString);
             });
 
             test('toStringAdjacency', () =>
             {
-               const testString = '0:\t./src/ESComplexProject.js\n\t2:\t./src/Plugins.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\n1:\t./src/index.js\n\t0:\t./src/ESComplexProject.js\n\n2:\t./src/Plugins.js\n\n3:\ttyphonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js\n\n4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\n5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\n7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\n8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n9:\ttyphonjs-escomplex-commons/src/module/traits/actualize.js\n\t10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\t13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\n10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\n12:\ttyphonjs-escomplex-commons/src/module/traits/safeName.js\n\n13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\n14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n16:\ttyphonjs-escomplex-commons/src/utils/MathUtil.js\n\n17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n';
+               const testString = '0:\t./src/ESComplexProject.js\n\t2:\t./src/Plugins.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t17:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\n1:\t./src/index.js\n\t0:\t./src/ESComplexProject.js\n\n2:\t./src/Plugins.js\n\n3:\t./test/fixture/testImportNPMAlias.js\n\t21:\ttyphonjs-escomplex-module/src/index.js\n\n4:\t./test/fixture/testRequireNPMAlias.js\n\t21:\ttyphonjs-escomplex-module/src/index.js\n\n5:\ttyphonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js\n\n6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\n7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\n9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\n10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n11:\ttyphonjs-escomplex-commons/src/module/traits/actualize.js\n\t12:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t13:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\t15:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\n12:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t16:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n13:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\n14:\ttyphonjs-escomplex-commons/src/module/traits/safeName.js\n\n15:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\n16:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n17:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t19:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n18:\ttyphonjs-escomplex-commons/src/utils/MathUtil.js\n\n19:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\t22:\ttyphonjs-escomplex-module/src/Plugins.js\n\n21:\ttyphonjs-escomplex-module/src/index.js\n\t20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\n22:\ttyphonjs-escomplex-module/src/Plugins.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\n';
 
                assert.strictEqual(result.toStringAdjacency(), testString);
             });
 
             test('toStringVisibility', () =>
             {
-               const testString = '0:\t./src/ESComplexProject.js\n\t0:\t./src/ESComplexProject.js\n\t2:\t./src/Plugins.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n1:\t./src/index.js\n\t0:\t./src/ESComplexProject.js\n\t1:\t./src/index.js\n\t2:\t./src/Plugins.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n2:\t./src/Plugins.js\n\t2:\t./src/Plugins.js\n\n3:\ttyphonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js\n\t3:\ttyphonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js\n\n4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\n5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\n7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\n9:\ttyphonjs-escomplex-commons/src/module/traits/actualize.js\n\t9:\ttyphonjs-escomplex-commons/src/module/traits/actualize.js\n\t10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\t13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\t14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t10:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\t11:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\n12:\ttyphonjs-escomplex-commons/src/module/traits/safeName.js\n\t12:\ttyphonjs-escomplex-commons/src/module/traits/safeName.js\n\n13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\t13:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\n14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\t14:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t4:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t5:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t15:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n16:\ttyphonjs-escomplex-commons/src/utils/MathUtil.js\n\t16:\ttyphonjs-escomplex-commons/src/utils/MathUtil.js\n\n17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\t17:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n';
+               const testString = '0:\t./src/ESComplexProject.js\n\t0:\t./src/ESComplexProject.js\n\t2:\t./src/Plugins.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t17:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t19:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\t20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\t22:\ttyphonjs-escomplex-module/src/Plugins.js\n\n1:\t./src/index.js\n\t0:\t./src/ESComplexProject.js\n\t1:\t./src/index.js\n\t2:\t./src/Plugins.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t17:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t19:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\t20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\t22:\ttyphonjs-escomplex-module/src/Plugins.js\n\n2:\t./src/Plugins.js\n\t2:\t./src/Plugins.js\n\n3:\t./test/fixture/testImportNPMAlias.js\n\t3:\t./test/fixture/testImportNPMAlias.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\t21:\ttyphonjs-escomplex-module/src/index.js\n\t22:\ttyphonjs-escomplex-module/src/Plugins.js\n\n4:\t./test/fixture/testRequireNPMAlias.js\n\t4:\t./test/fixture/testRequireNPMAlias.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\t21:\ttyphonjs-escomplex-module/src/index.js\n\t22:\ttyphonjs-escomplex-module/src/Plugins.js\n\n5:\ttyphonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js\n\t5:\ttyphonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js\n\n6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\n7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\n9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\n10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\n11:\ttyphonjs-escomplex-commons/src/module/traits/actualize.js\n\t11:\ttyphonjs-escomplex-commons/src/module/traits/actualize.js\n\t12:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t13:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\t15:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\t16:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n12:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t12:\ttyphonjs-escomplex-commons/src/module/traits/HalsteadArray.js\n\t16:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n13:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\t13:\ttyphonjs-escomplex-commons/src/module/traits/safeArray.js\n\n14:\ttyphonjs-escomplex-commons/src/module/traits/safeName.js\n\t14:\ttyphonjs-escomplex-commons/src/module/traits/safeName.js\n\n15:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\t15:\ttyphonjs-escomplex-commons/src/module/traits/Trait.js\n\n16:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\t16:\ttyphonjs-escomplex-commons/src/module/traits/TraitHalstead.js\n\n17:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t17:\ttyphonjs-escomplex-commons/src/project/result/ProjectResult.js\n\t19:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n18:\ttyphonjs-escomplex-commons/src/utils/MathUtil.js\n\t18:\ttyphonjs-escomplex-commons/src/utils/MathUtil.js\n\n19:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\t19:\ttyphonjs-escomplex-commons/src/utils/StringUtil.js\n\n20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\t22:\ttyphonjs-escomplex-module/src/Plugins.js\n\n21:\ttyphonjs-escomplex-module/src/index.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t20:\ttyphonjs-escomplex-module/src/ESComplexModule.js\n\t21:\ttyphonjs-escomplex-module/src/index.js\n\t22:\ttyphonjs-escomplex-module/src/Plugins.js\n\n22:\ttyphonjs-escomplex-module/src/Plugins.js\n\t6:\ttyphonjs-escomplex-commons/src/module/report/AbstractReport.js\n\t7:\ttyphonjs-escomplex-commons/src/module/report/ClassReport.js\n\t8:\ttyphonjs-escomplex-commons/src/module/report/HalsteadData.js\n\t9:\ttyphonjs-escomplex-commons/src/module/report/MethodReport.js\n\t10:\ttyphonjs-escomplex-commons/src/module/report/ModuleReport.js\n\t22:\ttyphonjs-escomplex-module/src/Plugins.js\n\n';
 
                assert.strictEqual(result.toStringVisibility(), testString);
             });
@@ -1072,24 +1104,24 @@ if (testconfig.modules['project'])
 
          suite('large project calculation performance', () =>
          {
-            const resultFixture = require('../fixture/large_report');
+            const resultFixture = require('../fixture/large_project');
             const resultSkipCalc = escomplexProject.analyze(s_LOCAL_TEST_DATA, { skipCalculation: true });
 
             test('deserialize JSON object should be sufficiently fast', function()
             {
-               this.timeout(40);
+               this.timeout(50);
                ProjectResult.parse(resultFixture);
             });
 
             test('running calculations should be sufficiently fast', function()
             {
-               this.timeout(40);
+               this.timeout(50);
                escomplexProject.processResults(resultSkipCalc);
             });
 
             test('running analyze should be sufficiently fast', function()
             {
-               this.timeout(100);
+               this.timeout(150);
                escomplexProject.analyze(s_LOCAL_TEST_DATA);
             });
          });
