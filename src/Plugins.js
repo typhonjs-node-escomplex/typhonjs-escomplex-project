@@ -22,6 +22,11 @@ export default class Plugins
     */
    constructor(options = {})
    {
+      /**
+       * Provides a generic plugin manager for dispatching events to module plugins.
+       * @type {PluginManager}
+       * @private
+       */
       this._pluginManager = new PluginManager();
 
       if (typeof options.loadDefaultPlugins === 'boolean' && !options.loadDefaultPlugins) { /* nop */ }

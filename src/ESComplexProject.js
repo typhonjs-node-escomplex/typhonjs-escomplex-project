@@ -80,10 +80,25 @@ export default class ESComplexProject
       /* istanbul ignore if */
       if (typeof options !== 'object') { throw new TypeError('ctor error: `options` is not an `object`.'); }
 
+      /**
+       * Stores a module which matches the NodeJS path module API.
+       * @type {Object}
+       * @private
+       */
       this._pathModule = pathModule;
 
+      /**
+       * Provides dispatch methods to all module plugins.
+       * @type {Plugins}
+       * @private
+       */
       this._plugins = new Plugins(options.project);
 
+      /**
+       * Stores the ESComplexModule instance used for generating module / file reports.
+       * @type {ESComplexModule}
+       * @private
+       */
       this._escomplexModule = new ESComplexModule(options.module);
    }
 
