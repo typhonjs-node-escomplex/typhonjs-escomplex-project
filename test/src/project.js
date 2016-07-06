@@ -131,7 +131,7 @@ if (testconfig.modules['project'])
             });
          });
 
-         test('analyzeAsync throws when modules is not an array', () =>
+         test('analyze throws when modules is not an array', () =>
          {
             assert.throws(() =>
             {
