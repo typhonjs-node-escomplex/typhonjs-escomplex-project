@@ -15,7 +15,7 @@ Provides project oriented AST processing for typhonjs-escomplex complexity repor
 More information forthcoming. This NPM module can be installed as a dependency in `package.json` as follows:
 ```
 "dependencies": {
-  "typhonjs-escomplex-project": "^0.0.3"
+  "typhonjs-escomplex-project": "^0.0.4"
 }
 ```
 
@@ -25,8 +25,8 @@ import escomplexProject from 'typhonjs-escomplex-project';
 
 const modules =
 [
-   { ast: <some parsed AST>, path: 'a/file/path/1' },
-   { ast: <some parsed AST>, path: 'a/file/path/2' }
+   { ast: <some parsed AST>, srcPath: 'a/file/path/1' },
+   { ast: <some parsed AST>, srcPath: 'a/file/path/2' }
 ]);
 
 const results = escomplexProject.analyze(modules);
@@ -39,8 +39,8 @@ var escomplexProject = require('typhonjs-escomplex-project');
 
 var modules =
 [
-   { ast: <some parsed AST>, path: 'a/file/path/1' },
-   { ast: <some parsed AST>, path: 'a/file/path/2' }
+   { ast: <some parsed AST>, srcPath: 'a/file/path/1' },
+   { ast: <some parsed AST>, srcPath: 'a/file/path/2' }
 ]);
 
 var results = escomplexProject.analyze(modules);
