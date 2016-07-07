@@ -1125,19 +1125,19 @@ if (testconfig.modules['project'])
 
             test('deserialize JSON object should be sufficiently fast', function()
             {
-               this.timeout(50);
+               this.timeout(100);
                ProjectResult.parse(resultFixture);
             });
 
             test('running calculations should be sufficiently fast', function()
             {
-               this.timeout(50);
+               this.timeout(100);
                escomplexProject.processResults(resultSkipCalc);
             });
 
             test('running analyze should be sufficiently fast', function()
             {
-               this.timeout(150);
+               this.timeout(200);
                escomplexProject.analyze(s_LOCAL_TEST_DATA);
             });
          });
