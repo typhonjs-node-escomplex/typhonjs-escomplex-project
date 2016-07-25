@@ -48,13 +48,14 @@ export default class Plugins
    {
       /**
        * Default settings with potential user override of `serializeReports` and `skipCalculation`.
-       * @type {{serializeReports: boolean}, {skipCalculation: boolean}}
+       * @type {{serializeReports: boolean, serializeAverages: boolean, skipCalculation: boolean, toFixed: boolean}}
        */
       const settings =
       {
          serializeReports: typeof options.serializeReports === 'boolean' ? options.serializeReports : true,
+         serializeAverages: typeof options.serializeAverages === 'boolean' ? options.serializeAverages : false,
          skipCalculation: typeof options.skipCalculation === 'boolean' ? options.skipCalculation : false
-      };
+     };
 
       const event = this._pluginManager.invoke('onConfigure', { options, settings }, true);
       return event !== null ? event.data.settings : settings;
