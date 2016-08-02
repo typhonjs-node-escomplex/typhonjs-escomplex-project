@@ -47,15 +47,14 @@ export default class Plugins
    onConfigure(options)
    {
       /**
-       * Default settings with potential user override of `serializeReports` and `skipCalculation`.
-       * @type {{serializeReports: boolean, serializeAverages: boolean, skipCalculation: boolean, toFixed: boolean}}
+       * Default settings with potential user override of `serializeModules` and `skipCalculation`.
+       * @type {{serializeModules: boolean, skipCalculation: boolean}}
        */
       const settings =
       {
-         serializeReports: typeof options.serializeReports === 'boolean' ? options.serializeReports : true,
-         serializeAverages: typeof options.serializeAverages === 'boolean' ? options.serializeAverages : false,
+         serializeModules: typeof options.serializeModules === 'boolean' ? options.serializeModules : true,
          skipCalculation: typeof options.skipCalculation === 'boolean' ? options.skipCalculation : false
-     };
+      };
 
       const event = this._pluginManager.invoke('onConfigure', { options, settings }, true);
       return event !== null ? event.data.settings : settings;
@@ -74,16 +73,17 @@ export default class Plugins
    }
 
    /**
-    * Invokes the `onProjectEnd` plugin callback for all loaded plugins such they might finish calculating results.
+    * Invokes the `onProjectEnd` plugin callback for all loaded plugins such they might finish calculating project
+    * report metrics.
     *
     * @param {object}   pathModule - Provides an object which matches the Node path module.
-    * @param {{reports: Array<ModuleReport>}} results -
+    * @param {ProjectReport} projectReport - An instance of ProjectReport.
     *
-    * @returns {{reports: Array<{}>}}
+    * @returns {ProjectReport}
     */
-   onProjectEnd(pathModule, results)
+   onProjectEnd(pathModule, projectReport)
    {
-      const event = this._pluginManager.invoke('onProjectEnd', { pathModule, results }, false);
-      return event !== null ? event.data.results : results;
+      const event = this._pluginManager.invoke('onProjectEnd', { pathModule, projectReport }, false);
+      return event !== null ? event.data.projectReport : projectReport;
    }
 }

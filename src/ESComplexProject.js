@@ -1,7 +1,7 @@
 import ESComplexModule  from 'typhonjs-escomplex-module/src/ESComplexModule';
 
 import ModuleReport     from 'typhonjs-escomplex-commons/src/module/report/ModuleReport';
-import ProjectResult    from 'typhonjs-escomplex-commons/src/project/result/ProjectResult';
+import ProjectReport    from 'typhonjs-escomplex-commons/src/project/report/ProjectReport';
 
 import Plugins          from './Plugins';
 
@@ -95,7 +95,7 @@ export default class ESComplexProject
       this._plugins = new Plugins(options.project);
 
       /**
-       * Stores the ESComplexModule instance used for generating module / file reports.
+       * Stores the ESComplexModule instance used for generating module reports.
        * @type {ESComplexModule}
        * @private
        */
@@ -110,7 +110,7 @@ export default class ESComplexProject
     *
     * @param {object}         options - (Optional) project processing options.
     *
-    * @returns {ProjectResult}
+    * @returns {ProjectReport}
     */
    analyze(modules, options = {})
    {
@@ -123,22 +123,22 @@ export default class ESComplexProject
 
       this._plugins.onProjectStart(this._pathModule, settings);
 
-      const reports = modules.map((m) =>
+      const moduleReports = modules.map((m) =>
       {
-         let report;
+         let moduleReport;
 
          if (typeof m.srcPath !== 'string' || m.srcPath === '') { throw new Error('analyze error: Invalid `srcPath`'); }
 
          try
          {
-            report = this._escomplexModule.analyze(m.ast, options);
+            moduleReport = this._escomplexModule.analyze(m.ast, options);
 
             // Set any supplied filePath / srcPath / srcPathAlias data.
-            report.filePath = m.filePath;
-            report.srcPath = m.srcPath;
-            report.srcPathAlias = m.srcPathAlias;
+            moduleReport.filePath = m.filePath;
+            moduleReport.srcPath = m.srcPath;
+            moduleReport.srcPathAlias = m.srcPathAlias;
 
-            return report;
+            return moduleReport;
          }
          catch (error)
          {
@@ -152,52 +152,52 @@ export default class ESComplexProject
          }
       }, []);
 
-      const results = new ProjectResult(reports, settings);
+      const projectReport = new ProjectReport(moduleReports, settings);
 
-      if (settings.skipCalculation) { return results; }
+      if (settings.skipCalculation) { return projectReport; }
 
-      this._plugins.onProjectEnd(this._pathModule, results);
+      this._plugins.onProjectEnd(this._pathModule, projectReport);
 
-      return results.finalize();
+      return projectReport.finalize();
    }
 
    /**
-    * Processes existing project results and calculates metrics via plugins.
+    * Processes an existing ProjectReport instance and calculates metrics via plugins.
     *
-    * @param {ProjectResult}  results - An instance of ProjectResult with a `reports` entry that is an Array of
-    *                                   ModuleReports.
+    * @param {ProjectReport}  projectReport - An instance of ProjectReport with a `modules` entry that is an Array of
+    *                                         ModuleReports.
     *
     * @param {object}         options - (Optional) project processing options.
     *
-    * @returns {ProjectResult}
+    * @returns {ProjectReport}
     */
-   processResults(results, options = {})
+   processResults(projectReport, options = {})
    {
       /* istanbul ignore if */
-      if (!(results instanceof ProjectResult))
+      if (!(projectReport instanceof ProjectReport))
       {
-         throw new TypeError('processResults error: `results` is not an instance of ProjectResult.');
+         throw new TypeError('processResults error: `projectReport` is not an instance of ProjectReport.');
       }
 
       /* istanbul ignore if */
       if (typeof options !== 'object') { throw new TypeError('processResults error: `options` is not an `object`.'); }
 
       /* istanbul ignore if */
-      if (results.reports.length > 0 && !(results.reports[0] instanceof ModuleReport))
+      if (projectReport.modules.length > 0 && !(projectReport.modules[0] instanceof ModuleReport))
       {
          throw new TypeError(
-          'processResults error: `results.reports` does not appear to contain `ModuleReport` entries.');
+          'processResults error: `projectReport.modules` does not appear to contain `ModuleReport` entries.');
       }
 
       const settings = this._plugins.onConfigure(options);
 
       // Override any stored settings given new options / settings set during processing reports.
-      results.settings = settings;
+      projectReport.settings = settings;
 
       this._plugins.onProjectStart(this._pathModule, settings);
-      this._plugins.onProjectEnd(this._pathModule, results);
+      this._plugins.onProjectEnd(this._pathModule, projectReport);
 
-      return results.finalize();
+      return projectReport.finalize();
    }
 
    // Asynchronous Promise based methods ----------------------------------------------------------------------------
@@ -210,7 +210,7 @@ export default class ESComplexProject
     *
     * @param {object}         options - project processing options
     *
-    * @returns {Promise<ProjectResult>}
+    * @returns {Promise<ProjectReport>}
     */
    analyzeAsync(modules, options = {})
    {
@@ -222,18 +222,18 @@ export default class ESComplexProject
    }
 
    /**
-    * Wraps in a Promise processing of existing project results and calculates metrics via plugins.
+    * Wraps in a Promise processing of existing ProjectReport instance and calculates metrics via plugins.
     *
-    * @param {object}   results - An object hash with a `reports` entry that is an Array of module results.
+    * @param {object}   projectReport - An instance of ProjectReport.
     * @param {object}   options - (Optional) project processing options.
     *
-    * @returns {Promise<ProjectResult>}
+    * @returns {Promise<ProjectReport>}
     */
-   processResultsAsync(results, options = {})
+   processResultsAsync(projectReport, options = {})
    {
       return new Promise((resolve, reject) =>
       {
-         try { resolve(this.processResults(results, options)); }
+         try { resolve(this.processResults(projectReport, options)); }
          catch (err) { /* istanbul ignore next */ reject(err); }
       });
    }
