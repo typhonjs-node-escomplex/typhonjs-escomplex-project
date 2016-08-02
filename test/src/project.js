@@ -118,9 +118,9 @@ if (testconfig.modules['project'])
             assert.isFunction(escomplexProject.analyze);
          });
 
-         test('processResults function is exported', () =>
+         test('process function is exported', () =>
          {
-            assert.isFunction(escomplexProject.processResults);
+            assert.isFunction(escomplexProject.process);
          });
 
          test('analyzeAsync function is exported', () =>
@@ -128,9 +128,9 @@ if (testconfig.modules['project'])
             assert.isFunction(escomplexProject.analyzeAsync);
          });
 
-         test('processResultsAsync function is exported', () =>
+         test('processAsync function is exported', () =>
          {
-            assert.isFunction(escomplexProject.processResultsAsync);
+            assert.isFunction(escomplexProject.processAsync);
          });
 
          test('analyze throws when modules is object', () =>
@@ -664,17 +664,17 @@ if (testconfig.modules['project'])
                assert.ok(results.moduleAverage.methodAverage.sloc.logical);
             });
 
-            test('should be able to run processResults', () =>
+            test('should be able to run process', () =>
             {
                const fullReport = escomplexProject.analyze(modules);
-               const calcReport = escomplexProject.processResults(reportsOnly);
+               const calcReport = escomplexProject.process(reportsOnly);
 
                assert.deepEqual(calcReport, fullReport);
             });
 
-            test('should be able to run processResults without calculating coreSize', () =>
+            test('should be able to run process without calculating coreSize', () =>
             {
-               const results = escomplexProject.processResults(reportsOnly, { noCoreSize: true });
+               const results = escomplexProject.process(reportsOnly, { noCoreSize: true });
                assert.strictEqual(results.coreSize, 0);
                assert.isUndefined(results.visibilityList);
 
@@ -683,11 +683,11 @@ if (testconfig.modules['project'])
                assert.ok(results.moduleAverage.methodAverage.sloc.logical);
             });
 
-            test('should be able to run processResultsAsync', () =>
+            test('should be able to run processAsync', () =>
             {
                const fullReport = escomplexProject.analyze(modules);
 
-               escomplexProject.processResultsAsync(reportsOnly).then((calcReport) =>
+               escomplexProject.processAsync(reportsOnly).then((calcReport) =>
                {
                   assert.deepEqual(calcReport, fullReport);
                });
@@ -1244,7 +1244,7 @@ result.modules.forEach((module, index) =>
             test('running calculations should be sufficiently fast', function()
             {
                this.timeout(150);
-               escomplexProject.processResults(resultSkipCalc);
+               escomplexProject.process(resultSkipCalc);
             });
 
             test('running analyze should be sufficiently fast', function()

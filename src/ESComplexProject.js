@@ -171,22 +171,22 @@ export default class ESComplexProject
     *
     * @returns {ProjectReport}
     */
-   processResults(projectReport, options = {})
+   process(projectReport, options = {})
    {
       /* istanbul ignore if */
       if (!(projectReport instanceof ProjectReport))
       {
-         throw new TypeError('processResults error: `projectReport` is not an instance of ProjectReport.');
+         throw new TypeError('process error: `projectReport` is not an instance of ProjectReport.');
       }
 
       /* istanbul ignore if */
-      if (typeof options !== 'object') { throw new TypeError('processResults error: `options` is not an `object`.'); }
+      if (typeof options !== 'object') { throw new TypeError('process error: `options` is not an `object`.'); }
 
       /* istanbul ignore if */
       if (projectReport.modules.length > 0 && !(projectReport.modules[0] instanceof ModuleReport))
       {
          throw new TypeError(
-          'processResults error: `projectReport.modules` does not appear to contain `ModuleReport` entries.');
+          'process error: `projectReport.modules` does not appear to contain `ModuleReport` entries.');
       }
 
       const settings = this._plugins.onConfigure(options);
@@ -224,16 +224,16 @@ export default class ESComplexProject
    /**
     * Wraps in a Promise processing of existing ProjectReport instance and calculates metrics via plugins.
     *
-    * @param {object}   projectReport - An instance of ProjectReport.
-    * @param {object}   options - (Optional) project processing options.
+    * @param {ProjectReport}  projectReport - An instance of ProjectReport.
+    * @param {object}         options - (Optional) project processing options.
     *
     * @returns {Promise<ProjectReport>}
     */
-   processResultsAsync(projectReport, options = {})
+   processAsync(projectReport, options = {})
    {
       return new Promise((resolve, reject) =>
       {
-         try { resolve(this.processResults(projectReport, options)); }
+         try { resolve(this.process(projectReport, options)); }
          catch (err) { /* istanbul ignore next */ reject(err); }
       });
    }
