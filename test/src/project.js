@@ -5,14 +5,22 @@ import { assert }       from 'chai';
 import parsers          from './parsers';
 import * as testconfig  from './testconfig';
 
-import ProjectResult    from 'typhonjs-escomplex-commons/src/project/result/ProjectResult';
+import ProjectReport    from 'typhonjs-escomplex-commons/src/project/report/ProjectReport';
 
 import escomplexProject from '../../src';
+
+// TODO REMOVE
+// import escomplexModule from 'typhonjs-escomplex-module';
 
 if (testconfig.modules['project'])
 {
    parsers.forEach((Parser) =>
    {
+      // TODO REMOVE
+      // const s_AST = Parser.parse(fs.readFileSync('./node_modules/typhonjs-escomplex-test-data/files/large-module/src/Collection.js', 'utf8'));
+      // const moduleReport = escomplexModule.analyze(s_AST);
+      // fs.writeFileSync(process.cwd() + '/test/fixture/module.json', moduleReport.toFormat('json', { spacing: 3 }), 'utf8');
+
       /**
        * Load project source and local test files from NPM module typhonjs-escomplex-commons and
        * typhonjs-escomplex-module. The order is purposely out of order to test sorting of `srcPath`.
@@ -24,10 +32,12 @@ if (testconfig.modules['project'])
          './node_modules/typhonjs-escomplex-module/src/index.js',
          './node_modules/typhonjs-escomplex-module/src/Plugins.js',
 
+         './node_modules/typhonjs-escomplex-commons/src/utils/Enum.js',
          './node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js',
          './node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js',
          './node_modules/typhonjs-escomplex-commons/src/utils/ObjectUtil.js',
-         './node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js',
+         './node_modules/typhonjs-escomplex-commons/src/project/report/ProjectReport.js',
+         './node_modules/typhonjs-escomplex-commons/src/types/ReportType.js',
          './node_modules/typhonjs-escomplex-commons/src/transform/TransformFormat.js',
          './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js',
          './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js',
@@ -47,6 +57,7 @@ if (testconfig.modules['project'])
          './node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js',
          './node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js',
          './node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js',
+         './node_modules/typhonjs-escomplex-commons/src/module/report/AggregateMethodReport.js',
          './node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js',
          './node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js',
          './node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js',
@@ -60,6 +71,7 @@ if (testconfig.modules['project'])
          './node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js',
          './node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js',
          './node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js',
+         './node_modules/typhonjs-escomplex-commons/src/analyze/AnalyzeError.js',
 
          './test/fixture/testImportNPMAlias.js',
          './test/fixture/testRequireNPMAlias.js',
@@ -190,14 +202,14 @@ if (testconfig.modules['project'])
                assert.isObject(result);
             });
 
-            test('reports array exists', () =>
+            test('modules array exists', () =>
             {
-               assert.isArray(result.reports);
+               assert.isArray(result.modules);
             });
 
-            test('reports array has zero length', () =>
+            test('modules array has zero length', () =>
             {
-               assert.lengthOf(result.reports, 0);
+               assert.lengthOf(result.modules, 0);
             });
 
             test('adjacency list exists', () =>
@@ -265,110 +277,110 @@ if (testconfig.modules['project'])
                result = undefined;
             });
 
-            test('reports is correct length', () =>
+            test('modules is correct length', () =>
             {
-               assert.lengthOf(result.reports, 1);
+               assert.lengthOf(result.modules, 1);
             });
 
-            test('first report aggregate has correct physical lines of code', () =>
+            test('first module methodAggregate has correct physical lines of code', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.sloc.physical, 1);
+               assert.strictEqual(result.modules[0].methodAggregate.sloc.physical, 1);
             });
 
-            test('first report aggregate has correct logical lines of code', () =>
+            test('first module methodAggregate has correct logical lines of code', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.sloc.logical, 4);
+               assert.strictEqual(result.modules[0].methodAggregate.sloc.logical, 4);
             });
 
-            test('first report aggregate has correct cyclomatic complexity', () =>
+            test('first module methodAggregate has correct cyclomatic complexity', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.cyclomatic, 2);
+               assert.strictEqual(result.modules[0].methodAggregate.cyclomatic, 2);
             });
 
-            test('first report aggregate has correct cyclomatic complexity density', () =>
+            test('first module methodAggregate has correct cyclomatic complexity density', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.cyclomaticDensity, 50);
+               assert.strictEqual(result.modules[0].methodAggregate.cyclomaticDensity, 50);
             });
 
-            test('first report methods is empty', () =>
+            test('first module methods is empty', () =>
             {
-               assert.lengthOf(result.reports[0].methods, 0);
+               assert.lengthOf(result.modules[0].methods, 0);
             });
 
-            test('first report aggregate has correct Halstead total operators', () =>
+            test('first module methodAggregate has correct Halstead total operators', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.operators.total, 2);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.operators.total, 2);
             });
 
-            test('first report aggregate has correct Halstead distinct operators', () =>
+            test('first module methodAggregate has correct Halstead distinct operators', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.operators.distinct, 2);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.operators.distinct, 2);
             });
 
-            test('first report aggregate has correct Halstead total operands', () =>
+            test('first module methodAggregate has correct Halstead total operands', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.operands.total, 3);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.operands.total, 3);
             });
 
-            test('first report aggregate has correct Halstead distinct operands', () =>
+            test('first module methodAggregate has correct Halstead distinct operands', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.operands.distinct, 3);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.operands.distinct, 3);
             });
 
-            test('first report aggregate has correct Halstead operator identifier length', () =>
+            test('first module methodAggregate has correct Halstead operator identifier length', () =>
             {
                assert.lengthOf(
-                  result.reports[0].aggregate.halstead.operators.identifiers,
-                  result.reports[0].aggregate.halstead.operators.distinct
+                  result.modules[0].methodAggregate.halstead.operators.identifiers,
+                  result.modules[0].methodAggregate.halstead.operators.distinct
                );
             });
 
-            test('first report aggregate has correct Halstead operand identifier length', () =>
+            test('first module methodAggregate has correct Halstead operand identifier length', () =>
             {
                assert.lengthOf(
-                  result.reports[0].aggregate.halstead.operands.identifiers,
-                  result.reports[0].aggregate.halstead.operands.distinct
+                  result.modules[0].methodAggregate.halstead.operands.identifiers,
+                  result.modules[0].methodAggregate.halstead.operands.distinct
                );
             });
 
-            test('first report aggregate has correct Halstead length', () =>
+            test('first module methodAggregate has correct Halstead length', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.length, 5);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.length, 5);
             });
 
-            test('first report aggregate has correct Halstead vocabulary', () =>
+            test('first module methodAggregate has correct Halstead vocabulary', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.vocabulary, 5);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.vocabulary, 5);
             });
 
-            test('first report aggregate has correct Halstead difficulty', () =>
+            test('first module methodAggregate has correct Halstead difficulty', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.difficulty, 1);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.difficulty, 1);
             });
 
-            test('first report aggregate has correct Halstead volume', () =>
+            test('first module methodAggregate has correct Halstead volume', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.volume, 11.61);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.volume, 11.61);
             });
 
-            test('first report aggregate has correct Halstead effort', () =>
+            test('first module methodAggregate has correct Halstead effort', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.effort, 11.61);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.effort, 11.61);
             });
 
-            test('first report aggregate has correct Halstead bugs', () =>
+            test('first module methodAggregate has correct Halstead bugs', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.bugs, 0.004);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.bugs, 0.004);
             });
 
-            test('first report aggregate has correct Halstead time', () =>
+            test('first module methodAggregate has correct Halstead time', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.time, 0.645);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.time, 0.645);
             });
 
-            test('first report has correct srcPath', () =>
+            test('first module has correct srcPath', () =>
             {
-               assert.strictEqual(result.reports[0].srcPath, 'a');
+               assert.strictEqual(result.modules[0].srcPath, 'a');
             });
 
             test('first-order density is correct', () =>
@@ -432,140 +444,140 @@ if (testconfig.modules['project'])
                result = undefined;
             });
 
-            test('reports is correct length', () =>
+            test('modules is correct length', () =>
             {
-               assert.lengthOf(result.reports, 2);
+               assert.lengthOf(result.modules, 2);
             });
 
-            test('first report aggregate has correct physical lines of code', () =>
+            test('first module methodAggregate has correct physical lines of code', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.sloc.physical, 1);
+               assert.strictEqual(result.modules[0].methodAggregate.sloc.physical, 1);
             });
 
-            test('first report aggregate has correct logical lines of code', () =>
+            test('first module methodAggregate has correct logical lines of code', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.sloc.logical, 4);
+               assert.strictEqual(result.modules[0].methodAggregate.sloc.logical, 4);
             });
 
-            test('first report aggregate has correct cyclomatic complexity', () =>
+            test('first module methodAggregate has correct cyclomatic complexity', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.cyclomatic, 2);
+               assert.strictEqual(result.modules[0].methodAggregate.cyclomatic, 2);
             });
 
-            test('first report aggregate has correct cyclomatic complexity density', () =>
+            test('first module methodAggregate has correct cyclomatic complexity density', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.cyclomaticDensity, 50);
+               assert.strictEqual(result.modules[0].methodAggregate.cyclomaticDensity, 50);
             });
 
-            test('first report methods is empty', () =>
+            test('first module methods is empty', () =>
             {
-               assert.lengthOf(result.reports[0].methods, 0);
+               assert.lengthOf(result.modules[0].methods, 0);
             });
 
-            test('first report aggregate has correct Halstead total operators', () =>
+            test('first module methodAggregate has correct Halstead total operators', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.operators.total, 2);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.operators.total, 2);
             });
 
-            test('first report aggregate has correct Halstead distinct operators', () =>
+            test('first module methodAggregate has correct Halstead distinct operators', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.operators.distinct, 2);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.operators.distinct, 2);
             });
 
-            test('first report aggregate has correct Halstead total operands', () =>
+            test('first module methodAggregate has correct Halstead total operands', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.operands.total, 3);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.operands.total, 3);
             });
 
-            test('first report aggregate has correct Halstead distinct operands', () =>
+            test('first module methodAggregate has correct Halstead distinct operands', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.operands.distinct, 3);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.operands.distinct, 3);
             });
 
-            test('first report aggregate has correct Halstead operator identifier length', () =>
+            test('first module methodAggregate has correct Halstead operator identifier length', () =>
             {
                assert.lengthOf(
-                  result.reports[0].aggregate.halstead.operators.identifiers,
-                  result.reports[0].aggregate.halstead.operators.distinct
+                  result.modules[0].methodAggregate.halstead.operators.identifiers,
+                  result.modules[0].methodAggregate.halstead.operators.distinct
                );
             });
 
-            test('first report aggregate has correct Halstead operand identifier length', () =>
+            test('first module methodAggregate has correct Halstead operand identifier length', () =>
             {
                assert.lengthOf(
-                  result.reports[0].aggregate.halstead.operands.identifiers,
-                  result.reports[0].aggregate.halstead.operands.distinct
+                  result.modules[0].methodAggregate.halstead.operands.identifiers,
+                  result.modules[0].methodAggregate.halstead.operands.distinct
                );
             });
 
-            test('first report aggregate has correct Halstead length', () =>
+            test('first module methodAggregate has correct Halstead length', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.length, 5);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.length, 5);
             });
 
-            test('first report aggregate has correct Halstead vocabulary', () =>
+            test('first module methodAggregate has correct Halstead vocabulary', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.vocabulary, 5);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.vocabulary, 5);
             });
 
-            test('first report aggregate has correct Halstead difficulty', () =>
+            test('first module methodAggregate has correct Halstead difficulty', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.difficulty, 1);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.difficulty, 1);
             });
 
-            test('first report aggregate has correct Halstead volume', () =>
+            test('first module methodAggregate has correct Halstead volume', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.volume, 11.61);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.volume, 11.61);
             });
 
-            test('first report aggregate has correct Halstead effort', () =>
+            test('first module methodAggregate has correct Halstead effort', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.effort, 11.61);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.effort, 11.61);
             });
 
-            test('first report aggregate has correct Halstead bugs', () =>
+            test('first module methodAggregate has correct Halstead bugs', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.bugs, 0.004);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.bugs, 0.004);
             });
 
-            test('first report aggregate has correct Halstead time', () =>
+            test('first module methodAggregate has correct Halstead time', () =>
             {
-               assert.strictEqual(result.reports[0].aggregate.halstead.time, 0.645);
+               assert.strictEqual(result.modules[0].methodAggregate.halstead.time, 0.645);
             });
 
-            test('first report has correct srcPath', () =>
+            test('first module has correct srcPath', () =>
             {
-               assert.strictEqual(result.reports[0].srcPath, 'a');
+               assert.strictEqual(result.modules[0].srcPath, 'a');
             });
 
-            test('second report maintainability index is correct', () =>
+            test('second module maintainability index is correct', () =>
             {
-               assert.strictEqual(result.reports[1].maintainability, 128.115);
+               assert.strictEqual(result.modules[1].maintainability, 128.115);
             });
 
-            test('second report first method has correct parameter count', () =>
+            test('second module first method has correct parameter count', () =>
             {
-               assert.strictEqual(result.reports[1].methods[0].params, 2);
+               assert.strictEqual(result.modules[1].methods[0].params, 2);
             });
 
-            test('second report second method has correct parameter count', () =>
+            test('second module second method has correct parameter count', () =>
             {
-               assert.strictEqual(result.reports[1].methods[1].params, 2);
+               assert.strictEqual(result.modules[1].methods[1].params, 2);
             });
 
-            test('second report aggregate has correct parameter count', () =>
+            test('second module methodAggregate has correct parameter count', () =>
             {
-               assert.strictEqual(result.reports[1].aggregate.params, 4);
+               assert.strictEqual(result.modules[1].methodAggregate.params, 4);
             });
 
-            test('second report mean parameter count is correct', () =>
+            test('second module mean parameter count is correct', () =>
             {
-               assert.strictEqual(result.reports[1].methodAverage.params, 2);
+               assert.strictEqual(result.modules[1].methodAverage.params, 2);
             });
 
-            test('second report has correct srcPath', () =>
+            test('second module has correct srcPath', () =>
             {
-               assert.strictEqual(result.reports[1].srcPath, 'b');
+               assert.strictEqual(result.modules[1].srcPath, 'b');
             });
 
             test('first-order density is correct', () =>
@@ -632,7 +644,7 @@ if (testconfig.modules['project'])
 
             test('should have default values if we call with skipCalculation', () =>
             {
-               assert.lengthOf(reportsOnly.reports, 2);
+               assert.lengthOf(reportsOnly.modules, 2);
                assert.strictEqual(reportsOnly.moduleAverage.methodAverage.sloc.logical, 0);
                assert.strictEqual(reportsOnly.moduleAverage.maintainability, 0);
                assert.strictEqual(reportsOnly.coreSize, 0);
@@ -682,13 +694,13 @@ if (testconfig.modules['project'])
             });
          });
 
-         suite('local source + NPM module typhonjs-escomplex-commons test w/ serializeReports false:', () =>
+         suite('local source + NPM module typhonjs-escomplex-commons test w/ serializeModules false:', () =>
          {
             let result;
 
             setup(() =>
             {
-               result = escomplexProject.analyze(s_LOCAL_TEST_DATA, { serializeReports: false });
+               result = escomplexProject.analyze(s_LOCAL_TEST_DATA, { serializeModules: false });
             });
 
             teardown(() =>
@@ -696,121 +708,129 @@ if (testconfig.modules['project'])
                result = undefined;
             });
 
-            test('reports are in correct order', () =>
+            test('modules are in correct order', () =>
             {
 // TODO REMOVE
-// fs.writeFileSync(process.cwd() + '/test/fixture/results-no-reports-with-averages.json', result.toFormat('json', { spacing: 3 }), 'utf8');
+// fs.writeFileSync(process.cwd() + '/test/fixture/project-no-modules.json', result.toFormat('json', { spacing: 3 }), 'utf8');
 
 // TODO REMOVE
 /*
-result.reports.forEach((report, index) =>
+result.modules.forEach((module, index) =>
 {
-   console.log(`assert.strictEqual(result.reports[${index}].filePath, '${report.filePath}');`);
+   console.log(`assert.strictEqual(result.modules[${index}].filePath, '${module.filePath}');`);
 });
 
-result.reports.forEach((report, index) =>
+result.modules.forEach((module, index) =>
 {
-   console.log(`assert.strictEqual(result.reports[${index}].srcPath, '${report.srcPath}');`);
+   console.log(`assert.strictEqual(result.modules[${index}].srcPath, '${module.srcPath}');`);
 });
 */
-               assert.strictEqual(result.reports[0].filePath, './src/ESComplexProject.js');
-               assert.strictEqual(result.reports[1].filePath, './src/index.js');
-               assert.strictEqual(result.reports[2].filePath, './src/Plugins.js');
-               assert.strictEqual(result.reports[3].filePath, './test/fixture/testImportNPMAlias.js');
-               assert.strictEqual(result.reports[4].filePath, './test/fixture/testRequireNPMAlias.js');
-               assert.strictEqual(result.reports[5].filePath, './node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
-               assert.strictEqual(result.reports[6].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
-               assert.strictEqual(result.reports[7].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js');
-               assert.strictEqual(result.reports[8].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js');
-               assert.strictEqual(result.reports[9].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js');
-               assert.strictEqual(result.reports[10].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js');
-               assert.strictEqual(result.reports[11].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
-               assert.strictEqual(result.reports[12].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js');
-               assert.strictEqual(result.reports[13].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
-               assert.strictEqual(result.reports[14].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js');
-               assert.strictEqual(result.reports[15].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
-               assert.strictEqual(result.reports[16].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js');
-               assert.strictEqual(result.reports[17].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js');
-               assert.strictEqual(result.reports[18].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js');
-               assert.strictEqual(result.reports[19].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
-               assert.strictEqual(result.reports[20].filePath, './node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
-               assert.strictEqual(result.reports[21].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js');
-               assert.strictEqual(result.reports[22].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js');
-               assert.strictEqual(result.reports[23].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js');
-               assert.strictEqual(result.reports[24].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js');
-               assert.strictEqual(result.reports[25].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js');
-               assert.strictEqual(result.reports[26].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js');
-               assert.strictEqual(result.reports[27].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js');
-               assert.strictEqual(result.reports[28].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js');
-               assert.strictEqual(result.reports[29].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js');
-               assert.strictEqual(result.reports[30].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js');
-               assert.strictEqual(result.reports[31].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js');
-               assert.strictEqual(result.reports[32].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js');
-               assert.strictEqual(result.reports[33].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js');
-               assert.strictEqual(result.reports[34].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js');
-               assert.strictEqual(result.reports[35].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js');
-               assert.strictEqual(result.reports[36].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js');
-               assert.strictEqual(result.reports[37].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/TransformFormat.js');
-               assert.strictEqual(result.reports[38].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js');
-               assert.strictEqual(result.reports[39].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/ObjectUtil.js');
-               assert.strictEqual(result.reports[40].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js');
-               assert.strictEqual(result.reports[41].filePath, './node_modules/typhonjs-escomplex-module/src/ESComplexModule.js');
-               assert.strictEqual(result.reports[42].filePath, './node_modules/typhonjs-escomplex-module/src/index.js');
-               assert.strictEqual(result.reports[43].filePath, './node_modules/typhonjs-escomplex-module/src/Plugins.js');
+               assert.strictEqual(result.modules[0].filePath, './src/ESComplexProject.js');
+               assert.strictEqual(result.modules[1].filePath, './src/index.js');
+               assert.strictEqual(result.modules[2].filePath, './src/Plugins.js');
+               assert.strictEqual(result.modules[3].filePath, './test/fixture/testImportNPMAlias.js');
+               assert.strictEqual(result.modules[4].filePath, './test/fixture/testRequireNPMAlias.js');
+               assert.strictEqual(result.modules[5].filePath, './node_modules/typhonjs-escomplex-commons/src/analyze/AnalyzeError.js');
+               assert.strictEqual(result.modules[6].filePath, './node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
+               assert.strictEqual(result.modules[7].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
+               assert.strictEqual(result.modules[8].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/AggregateMethodReport.js');
+               assert.strictEqual(result.modules[9].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js');
+               assert.strictEqual(result.modules[10].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js');
+               assert.strictEqual(result.modules[11].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js');
+               assert.strictEqual(result.modules[12].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js');
+               assert.strictEqual(result.modules[13].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
+               assert.strictEqual(result.modules[14].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js');
+               assert.strictEqual(result.modules[15].filePath, './node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
+               assert.strictEqual(result.modules[16].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js');
+               assert.strictEqual(result.modules[17].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
+               assert.strictEqual(result.modules[18].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js');
+               assert.strictEqual(result.modules[19].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js');
+               assert.strictEqual(result.modules[20].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js');
+               assert.strictEqual(result.modules[21].filePath, './node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
+               assert.strictEqual(result.modules[22].filePath, './node_modules/typhonjs-escomplex-commons/src/project/report/ProjectReport.js');
+               assert.strictEqual(result.modules[23].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js');
+               assert.strictEqual(result.modules[24].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js');
+               assert.strictEqual(result.modules[25].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js');
+               assert.strictEqual(result.modules[26].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js');
+               assert.strictEqual(result.modules[27].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js');
+               assert.strictEqual(result.modules[28].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js');
+               assert.strictEqual(result.modules[29].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js');
+               assert.strictEqual(result.modules[30].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js');
+               assert.strictEqual(result.modules[31].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js');
+               assert.strictEqual(result.modules[32].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js');
+               assert.strictEqual(result.modules[33].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js');
+               assert.strictEqual(result.modules[34].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js');
+               assert.strictEqual(result.modules[35].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js');
+               assert.strictEqual(result.modules[36].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js');
+               assert.strictEqual(result.modules[37].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js');
+               assert.strictEqual(result.modules[38].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js');
+               assert.strictEqual(result.modules[39].filePath, './node_modules/typhonjs-escomplex-commons/src/transform/TransformFormat.js');
+               assert.strictEqual(result.modules[40].filePath, './node_modules/typhonjs-escomplex-commons/src/types/ReportType.js');
+               assert.strictEqual(result.modules[41].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/Enum.js');
+               assert.strictEqual(result.modules[42].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js');
+               assert.strictEqual(result.modules[43].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/ObjectUtil.js');
+               assert.strictEqual(result.modules[44].filePath, './node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js');
+               assert.strictEqual(result.modules[45].filePath, './node_modules/typhonjs-escomplex-module/src/ESComplexModule.js');
+               assert.strictEqual(result.modules[46].filePath, './node_modules/typhonjs-escomplex-module/src/index.js');
+               assert.strictEqual(result.modules[47].filePath, './node_modules/typhonjs-escomplex-module/src/Plugins.js');
 
-               assert.strictEqual(result.reports[0].srcPath, './src/ESComplexProject.js');
-               assert.strictEqual(result.reports[1].srcPath, './src/index.js');
-               assert.strictEqual(result.reports[2].srcPath, './src/Plugins.js');
-               assert.strictEqual(result.reports[3].srcPath, './test/fixture/testImportNPMAlias.js');
-               assert.strictEqual(result.reports[4].srcPath, './test/fixture/testRequireNPMAlias.js');
-               assert.strictEqual(result.reports[5].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
-               assert.strictEqual(result.reports[6].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
-               assert.strictEqual(result.reports[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js');
-               assert.strictEqual(result.reports[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js');
-               assert.strictEqual(result.reports[9].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js');
-               assert.strictEqual(result.reports[10].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
-               assert.strictEqual(result.reports[11].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
-               assert.strictEqual(result.reports[12].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
-               assert.strictEqual(result.reports[13].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
-               assert.strictEqual(result.reports[14].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
-               assert.strictEqual(result.reports[15].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
-               assert.strictEqual(result.reports[16].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
-               assert.strictEqual(result.reports[17].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
-               assert.strictEqual(result.reports[18].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
-               assert.strictEqual(result.reports[19].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
-               assert.strictEqual(result.reports[20].srcPath, 'typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
-               assert.strictEqual(result.reports[21].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js');
-               assert.strictEqual(result.reports[22].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js');
-               assert.strictEqual(result.reports[23].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js');
-               assert.strictEqual(result.reports[24].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js');
-               assert.strictEqual(result.reports[25].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js');
-               assert.strictEqual(result.reports[26].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js');
-               assert.strictEqual(result.reports[27].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js');
-               assert.strictEqual(result.reports[28].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js');
-               assert.strictEqual(result.reports[29].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js');
-               assert.strictEqual(result.reports[30].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js');
-               assert.strictEqual(result.reports[31].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js');
-               assert.strictEqual(result.reports[32].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js');
-               assert.strictEqual(result.reports[33].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js');
-               assert.strictEqual(result.reports[34].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js');
-               assert.strictEqual(result.reports[35].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js');
-               assert.strictEqual(result.reports[36].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js');
-               assert.strictEqual(result.reports[37].srcPath, 'typhonjs-escomplex-commons/src/transform/TransformFormat.js');
-               assert.strictEqual(result.reports[38].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
-               assert.strictEqual(result.reports[39].srcPath, 'typhonjs-escomplex-commons/src/utils/ObjectUtil.js');
-               assert.strictEqual(result.reports[40].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
-               assert.strictEqual(result.reports[41].srcPath, 'typhonjs-escomplex-module/src/ESComplexModule.js');
-               assert.strictEqual(result.reports[42].srcPath, 'typhonjs-escomplex-module/src/index.js');
-               assert.strictEqual(result.reports[43].srcPath, 'typhonjs-escomplex-module/src/Plugins.js');
+               assert.strictEqual(result.modules[0].srcPath, './src/ESComplexProject.js');
+               assert.strictEqual(result.modules[1].srcPath, './src/index.js');
+               assert.strictEqual(result.modules[2].srcPath, './src/Plugins.js');
+               assert.strictEqual(result.modules[3].srcPath, './test/fixture/testImportNPMAlias.js');
+               assert.strictEqual(result.modules[4].srcPath, './test/fixture/testRequireNPMAlias.js');
+               assert.strictEqual(result.modules[5].srcPath, 'typhonjs-escomplex-commons/src/analyze/AnalyzeError.js');
+               assert.strictEqual(result.modules[6].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
+               assert.strictEqual(result.modules[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
+               assert.strictEqual(result.modules[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/AggregateMethodReport.js');
+               assert.strictEqual(result.modules[9].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js');
+               assert.strictEqual(result.modules[10].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js');
+               assert.strictEqual(result.modules[11].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js');
+               assert.strictEqual(result.modules[12].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
+               assert.strictEqual(result.modules[13].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
+               assert.strictEqual(result.modules[14].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
+               assert.strictEqual(result.modules[15].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
+               assert.strictEqual(result.modules[16].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
+               assert.strictEqual(result.modules[17].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
+               assert.strictEqual(result.modules[18].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
+               assert.strictEqual(result.modules[19].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
+               assert.strictEqual(result.modules[20].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
+               assert.strictEqual(result.modules[21].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
+               assert.strictEqual(result.modules[22].srcPath, 'typhonjs-escomplex-commons/src/project/report/ProjectReport.js');
+               assert.strictEqual(result.modules[23].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js');
+               assert.strictEqual(result.modules[24].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js');
+               assert.strictEqual(result.modules[25].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js');
+               assert.strictEqual(result.modules[26].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js');
+               assert.strictEqual(result.modules[27].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js');
+               assert.strictEqual(result.modules[28].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js');
+               assert.strictEqual(result.modules[29].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js');
+               assert.strictEqual(result.modules[30].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js');
+               assert.strictEqual(result.modules[31].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js');
+               assert.strictEqual(result.modules[32].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js');
+               assert.strictEqual(result.modules[33].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js');
+               assert.strictEqual(result.modules[34].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js');
+               assert.strictEqual(result.modules[35].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js');
+               assert.strictEqual(result.modules[36].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js');
+               assert.strictEqual(result.modules[37].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js');
+               assert.strictEqual(result.modules[38].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js');
+               assert.strictEqual(result.modules[39].srcPath, 'typhonjs-escomplex-commons/src/transform/TransformFormat.js');
+               assert.strictEqual(result.modules[40].srcPath, 'typhonjs-escomplex-commons/src/types/ReportType.js');
+               assert.strictEqual(result.modules[41].srcPath, 'typhonjs-escomplex-commons/src/utils/Enum.js');
+               assert.strictEqual(result.modules[42].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
+               assert.strictEqual(result.modules[43].srcPath, 'typhonjs-escomplex-commons/src/utils/ObjectUtil.js');
+               assert.strictEqual(result.modules[44].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
+               assert.strictEqual(result.modules[45].srcPath, 'typhonjs-escomplex-module/src/ESComplexModule.js');
+               assert.strictEqual(result.modules[46].srcPath, 'typhonjs-escomplex-module/src/index.js');
+               assert.strictEqual(result.modules[47].srcPath, 'typhonjs-escomplex-module/src/Plugins.js');
 
-               assert.strictEqual(result.reports[42].srcPathAlias, 'typhonjs-escomplex-module');
+               assert.strictEqual(result.modules[46].srcPathAlias, 'typhonjs-escomplex-module');
             });
 
-            test('reports only contains object hash w/ filePath, srcPath and srcPathAlias entries', () =>
+            test('modules only contains object hash w/ filePath, srcPath and srcPathAlias entries', () =>
             {
-               const testString = '[{"filePath":"./src/ESComplexProject.js","srcPath":"./src/ESComplexProject.js"},{"filePath":"./src/index.js","srcPath":"./src/index.js"},{"filePath":"./src/Plugins.js","srcPath":"./src/Plugins.js"},{"filePath":"./test/fixture/testImportNPMAlias.js","srcPath":"./test/fixture/testImportNPMAlias.js"},{"filePath":"./test/fixture/testRequireNPMAlias.js","srcPath":"./test/fixture/testRequireNPMAlias.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js","srcPath":"typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/AbstractReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js","srcPath":"typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js","srcPath":"typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js","srcPath":"typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ClassReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js","srcPath":"typhonjs-escomplex-commons/src/module/report/HalsteadData.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/MethodReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ModuleReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/actualize.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeName.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/Trait.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/project/result/ProjectResult.js","srcPath":"typhonjs-escomplex-commons/src/project/result/ProjectResult.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/TransformFormat.js","srcPath":"typhonjs-escomplex-commons/src/transform/TransformFormat.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/MathUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/ObjectUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/ObjectUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/StringUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-module/src/ESComplexModule.js","srcPath":"typhonjs-escomplex-module/src/ESComplexModule.js"},{"filePath":"./node_modules/typhonjs-escomplex-module/src/index.js","srcPath":"typhonjs-escomplex-module/src/index.js","srcPathAlias":"typhonjs-escomplex-module"},{"filePath":"./node_modules/typhonjs-escomplex-module/src/Plugins.js","srcPath":"typhonjs-escomplex-module/src/Plugins.js"}]';
+               const testString = '[{"filePath":"./src/ESComplexProject.js","srcPath":"./src/ESComplexProject.js"},{"filePath":"./src/index.js","srcPath":"./src/index.js"},{"filePath":"./src/Plugins.js","srcPath":"./src/Plugins.js"},{"filePath":"./test/fixture/testImportNPMAlias.js","srcPath":"./test/fixture/testImportNPMAlias.js"},{"filePath":"./test/fixture/testRequireNPMAlias.js","srcPath":"./test/fixture/testRequireNPMAlias.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/analyze/AnalyzeError.js","srcPath":"typhonjs-escomplex-commons/src/analyze/AnalyzeError.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js","srcPath":"typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/AbstractReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/AbstractReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/AggregateMethodReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/AggregateMethodReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js","srcPath":"typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js","srcPath":"typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js","srcPath":"typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ClassReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ClassReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/HalsteadData.js","srcPath":"typhonjs-escomplex-commons/src/module/report/HalsteadData.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/MethodReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/MethodReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/report/ModuleReport.js","srcPath":"typhonjs-escomplex-commons/src/module/report/ModuleReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/actualize.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/actualize.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeArray.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeArray.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/safeName.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/safeName.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/Trait.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/Trait.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js","srcPath":"typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/project/report/ProjectReport.js","srcPath":"typhonjs-escomplex-commons/src/project/report/ProjectReport.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js","srcPath":"typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/transform/TransformFormat.js","srcPath":"typhonjs-escomplex-commons/src/transform/TransformFormat.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/types/ReportType.js","srcPath":"typhonjs-escomplex-commons/src/types/ReportType.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/Enum.js","srcPath":"typhonjs-escomplex-commons/src/utils/Enum.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/MathUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/MathUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/ObjectUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/ObjectUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-commons/src/utils/StringUtil.js","srcPath":"typhonjs-escomplex-commons/src/utils/StringUtil.js"},{"filePath":"./node_modules/typhonjs-escomplex-module/src/ESComplexModule.js","srcPath":"typhonjs-escomplex-module/src/ESComplexModule.js"},{"filePath":"./node_modules/typhonjs-escomplex-module/src/index.js","srcPath":"typhonjs-escomplex-module/src/index.js","srcPathAlias":"typhonjs-escomplex-module"},{"filePath":"./node_modules/typhonjs-escomplex-module/src/Plugins.js","srcPath":"typhonjs-escomplex-module/src/Plugins.js"}]';
 
-               assert.strictEqual(JSON.stringify(result.reports), testString);
+               assert.strictEqual(JSON.stringify(result.modules), testString);
             });
          });
 
@@ -820,7 +840,7 @@ result.reports.forEach((report, index) =>
 
             setup(() =>
             {
-               result = escomplexProject.analyze(s_LOCAL_TEST_DATA, { commonjs: true, serializeReports: false });
+               result = escomplexProject.analyze(s_LOCAL_TEST_DATA, { commonjs: true, serializeModules: false });
             });
 
             teardown(() =>
@@ -828,64 +848,68 @@ result.reports.forEach((report, index) =>
                result = undefined;
             });
 
-            test('reports are in correct order', () =>
+            test('modules are in correct order', () =>
             {
-               assert.strictEqual(result.reports[0].srcPath, './src/ESComplexProject.js');
-               assert.strictEqual(result.reports[1].srcPath, './src/index.js');
-               assert.strictEqual(result.reports[2].srcPath, './src/Plugins.js');
-               assert.strictEqual(result.reports[3].srcPath, './test/fixture/testImportNPMAlias.js');
-               assert.strictEqual(result.reports[4].srcPath, './test/fixture/testRequireNPMAlias.js');
-               assert.strictEqual(result.reports[5].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
-               assert.strictEqual(result.reports[6].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
-               assert.strictEqual(result.reports[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js');
-               assert.strictEqual(result.reports[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js');
-               assert.strictEqual(result.reports[9].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js');
-               assert.strictEqual(result.reports[10].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
-               assert.strictEqual(result.reports[11].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
-               assert.strictEqual(result.reports[12].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
-               assert.strictEqual(result.reports[13].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
-               assert.strictEqual(result.reports[14].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
-               assert.strictEqual(result.reports[15].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
-               assert.strictEqual(result.reports[16].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
-               assert.strictEqual(result.reports[17].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
-               assert.strictEqual(result.reports[18].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
-               assert.strictEqual(result.reports[19].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
-               assert.strictEqual(result.reports[20].srcPath, 'typhonjs-escomplex-commons/src/project/result/ProjectResult.js');
-               assert.strictEqual(result.reports[21].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js');
-               assert.strictEqual(result.reports[22].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js');
-               assert.strictEqual(result.reports[23].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js');
-               assert.strictEqual(result.reports[24].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js');
-               assert.strictEqual(result.reports[25].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js');
-               assert.strictEqual(result.reports[26].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js');
-               assert.strictEqual(result.reports[27].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js');
-               assert.strictEqual(result.reports[28].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js');
-               assert.strictEqual(result.reports[29].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js');
-               assert.strictEqual(result.reports[30].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js');
-               assert.strictEqual(result.reports[31].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js');
-               assert.strictEqual(result.reports[32].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js');
-               assert.strictEqual(result.reports[33].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js');
-               assert.strictEqual(result.reports[34].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js');
-               assert.strictEqual(result.reports[35].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js');
-               assert.strictEqual(result.reports[36].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js');
-               assert.strictEqual(result.reports[37].srcPath, 'typhonjs-escomplex-commons/src/transform/TransformFormat.js');
-               assert.strictEqual(result.reports[38].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
-               assert.strictEqual(result.reports[39].srcPath, 'typhonjs-escomplex-commons/src/utils/ObjectUtil.js');
-               assert.strictEqual(result.reports[40].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
-               assert.strictEqual(result.reports[41].srcPath, 'typhonjs-escomplex-module/src/ESComplexModule.js');
-               assert.strictEqual(result.reports[42].srcPath, 'typhonjs-escomplex-module/src/index.js');
-               assert.strictEqual(result.reports[43].srcPath, 'typhonjs-escomplex-module/src/Plugins.js');
+               assert.strictEqual(result.modules[0].srcPath, './src/ESComplexProject.js');
+               assert.strictEqual(result.modules[1].srcPath, './src/index.js');
+               assert.strictEqual(result.modules[2].srcPath, './src/Plugins.js');
+               assert.strictEqual(result.modules[3].srcPath, './test/fixture/testImportNPMAlias.js');
+               assert.strictEqual(result.modules[4].srcPath, './test/fixture/testRequireNPMAlias.js');
+               assert.strictEqual(result.modules[5].srcPath, 'typhonjs-escomplex-commons/src/analyze/AnalyzeError.js');
+               assert.strictEqual(result.modules[6].srcPath, 'typhonjs-escomplex-commons/src/module/plugin/syntax/AbstractSyntaxLoader.js');
+               assert.strictEqual(result.modules[7].srcPath, 'typhonjs-escomplex-commons/src/module/report/AbstractReport.js');
+               assert.strictEqual(result.modules[8].srcPath, 'typhonjs-escomplex-commons/src/module/report/AggregateMethodReport.js');
+               assert.strictEqual(result.modules[9].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/HalsteadAverage.js');
+               assert.strictEqual(result.modules[10].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/MethodAverage.js');
+               assert.strictEqual(result.modules[11].srcPath, 'typhonjs-escomplex-commons/src/module/report/averages/ModuleAverage.js');
+               assert.strictEqual(result.modules[12].srcPath, 'typhonjs-escomplex-commons/src/module/report/ClassReport.js');
+               assert.strictEqual(result.modules[13].srcPath, 'typhonjs-escomplex-commons/src/module/report/HalsteadData.js');
+               assert.strictEqual(result.modules[14].srcPath, 'typhonjs-escomplex-commons/src/module/report/MethodReport.js');
+               assert.strictEqual(result.modules[15].srcPath, 'typhonjs-escomplex-commons/src/module/report/ModuleReport.js');
+               assert.strictEqual(result.modules[16].srcPath, 'typhonjs-escomplex-commons/src/module/traits/actualize.js');
+               assert.strictEqual(result.modules[17].srcPath, 'typhonjs-escomplex-commons/src/module/traits/HalsteadArray.js');
+               assert.strictEqual(result.modules[18].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeArray.js');
+               assert.strictEqual(result.modules[19].srcPath, 'typhonjs-escomplex-commons/src/module/traits/safeName.js');
+               assert.strictEqual(result.modules[20].srcPath, 'typhonjs-escomplex-commons/src/module/traits/Trait.js');
+               assert.strictEqual(result.modules[21].srcPath, 'typhonjs-escomplex-commons/src/module/traits/TraitHalstead.js');
+               assert.strictEqual(result.modules[22].srcPath, 'typhonjs-escomplex-commons/src/project/report/ProjectReport.js');
+               assert.strictEqual(result.modules[23].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSON.js');
+               assert.strictEqual(result.modules[24].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONCheckstyle.js');
+               assert.strictEqual(result.modules[25].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONMinimal.js');
+               assert.strictEqual(result.modules[26].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/json/FormatJSONModules.js');
+               assert.strictEqual(result.modules[27].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdown.js');
+               assert.strictEqual(result.modules[28].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownAdjacency.js');
+               assert.strictEqual(result.modules[29].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownMinimal.js');
+               assert.strictEqual(result.modules[30].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownModules.js');
+               assert.strictEqual(result.modules[31].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/markdown/FormatMarkdownVisibility.js');
+               assert.strictEqual(result.modules[32].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/AbstractFormatText.js');
+               assert.strictEqual(result.modules[33].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/AbstractTextMatrix.js');
+               assert.strictEqual(result.modules[34].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatText.js');
+               assert.strictEqual(result.modules[35].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextAdjacency.js');
+               assert.strictEqual(result.modules[36].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextMinimal.js');
+               assert.strictEqual(result.modules[37].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextModules.js');
+               assert.strictEqual(result.modules[38].srcPath, 'typhonjs-escomplex-commons/src/transform/formats/text/FormatTextVisibility.js');
+               assert.strictEqual(result.modules[39].srcPath, 'typhonjs-escomplex-commons/src/transform/TransformFormat.js');
+               assert.strictEqual(result.modules[40].srcPath, 'typhonjs-escomplex-commons/src/types/ReportType.js');
+               assert.strictEqual(result.modules[41].srcPath, 'typhonjs-escomplex-commons/src/utils/Enum.js');
+               assert.strictEqual(result.modules[42].srcPath, 'typhonjs-escomplex-commons/src/utils/MathUtil.js');
+               assert.strictEqual(result.modules[43].srcPath, 'typhonjs-escomplex-commons/src/utils/ObjectUtil.js');
+               assert.strictEqual(result.modules[44].srcPath, 'typhonjs-escomplex-commons/src/utils/StringUtil.js');
+               assert.strictEqual(result.modules[45].srcPath, 'typhonjs-escomplex-module/src/ESComplexModule.js');
+               assert.strictEqual(result.modules[46].srcPath, 'typhonjs-escomplex-module/src/index.js');
+               assert.strictEqual(result.modules[47].srcPath, 'typhonjs-escomplex-module/src/Plugins.js');
             });
 
             test('adjacency list is correct', () =>
             {
-               const testString = '[{"row":0,"cols":[2,13,20,41]},{"row":1,"cols":[0]},{"row":3,"cols":[42]},{"row":4,"cols":[42]},{"row":8,"cols":[7]},{"row":9,"cols":[8]},{"row":10,"cols":[6,8,12]},{"row":12,"cols":[6,11]},{"row":13,"cols":[6,8,10,12,37,38]},{"row":14,"cols":[15,16,18]},{"row":15,"cols":[19]},{"row":20,"cols":[9,13,37,38,40]},{"row":22,"cols":[39]},{"row":23,"cols":[39]},{"row":25,"cols":[32,40]},{"row":26,"cols":[33]},{"row":27,"cols":[34,40]},{"row":28,"cols":[35]},{"row":29,"cols":[36]},{"row":30,"cols":[40]},{"row":31,"cols":[39]},{"row":32,"cols":[30,37]},{"row":33,"cols":[31]},{"row":34,"cols":[30]},{"row":35,"cols":[30]},{"row":36,"cols":[31]},{"row":37,"cols":[13,20,21,22,23,24,25,26,27,28,29,32,33,34,35,36]},{"row":38,"cols":[39]},{"row":40,"cols":[39]},{"row":41,"cols":[43]},{"row":42,"cols":[41]},{"row":43,"cols":[13]}]';
+               const testString = '[{"row":0,"cols":[2,15,22,45]},{"row":1,"cols":[0]},{"row":3,"cols":[46]},{"row":4,"cols":[46]},{"row":5,"cols":[40]},{"row":7,"cols":[39]},{"row":8,"cols":[7,13]},{"row":10,"cols":[9]},{"row":11,"cols":[10]},{"row":12,"cols":[5,7,8,10,39,40,43]},{"row":14,"cols":[5,8]},{"row":15,"cols":[5,7,8,10,12,39,40,42,43]},{"row":16,"cols":[17,18,20]},{"row":17,"cols":[21]},{"row":22,"cols":[11,15,39,40,42,43,44]},{"row":24,"cols":[40,43]},{"row":25,"cols":[40,43]},{"row":26,"cols":[40]},{"row":27,"cols":[34,44]},{"row":28,"cols":[35]},{"row":29,"cols":[36,44]},{"row":30,"cols":[37,44]},{"row":31,"cols":[38]},{"row":32,"cols":[40,43,44]},{"row":33,"cols":[40,43]},{"row":34,"cols":[32,39,40,44]},{"row":35,"cols":[33]},{"row":36,"cols":[32,40,44]},{"row":37,"cols":[32,40,44]},{"row":38,"cols":[33]},{"row":39,"cols":[23,24,25,26,27,28,29,30,31,34,35,36,37,38,40]},{"row":40,"cols":[41]},{"row":42,"cols":[43]},{"row":44,"cols":[43]},{"row":45,"cols":[47]},{"row":46,"cols":[45]},{"row":47,"cols":[15]}]';
 
                assert.strictEqual(JSON.stringify(result.adjacencyList), testString);
             });
 
             test('visibility list is correct', () =>
             {
-               const testString = '[{"row":0,"cols":[0,2,6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43]},{"row":1,"cols":[0,1,2,6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43]},{"row":2,"cols":[2]},{"row":3,"cols":[3,6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43]},{"row":4,"cols":[4,6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43]},{"row":5,"cols":[5]},{"row":6,"cols":[6]},{"row":7,"cols":[7]},{"row":8,"cols":[7,8]},{"row":9,"cols":[7,8,9]},{"row":10,"cols":[6,7,8,10,11,12]},{"row":11,"cols":[11]},{"row":12,"cols":[6,11,12]},{"row":13,"cols":[6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]},{"row":14,"cols":[14,15,16,18,19]},{"row":15,"cols":[15,19]},{"row":16,"cols":[16]},{"row":17,"cols":[17]},{"row":18,"cols":[18]},{"row":19,"cols":[19]},{"row":20,"cols":[6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]},{"row":21,"cols":[21]},{"row":22,"cols":[22,39]},{"row":23,"cols":[23,39]},{"row":24,"cols":[24]},{"row":25,"cols":[6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]},{"row":26,"cols":[26,31,33,39]},{"row":27,"cols":[27,30,34,39,40]},{"row":28,"cols":[28,30,35,39,40]},{"row":29,"cols":[29,31,36,39]},{"row":30,"cols":[30,39,40]},{"row":31,"cols":[31,39]},{"row":32,"cols":[6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]},{"row":33,"cols":[31,33,39]},{"row":34,"cols":[30,34,39,40]},{"row":35,"cols":[30,35,39,40]},{"row":36,"cols":[31,36,39]},{"row":37,"cols":[6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]},{"row":38,"cols":[38,39]},{"row":39,"cols":[39]},{"row":40,"cols":[39,40]},{"row":41,"cols":[6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43]},{"row":42,"cols":[6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43]},{"row":43,"cols":[6,7,8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,43]}]';
+               const testString = '[{"row":0,"cols":[0,2,5,7,8,9,10,11,12,13,15,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,47]},{"row":1,"cols":[0,1,2,5,7,8,9,10,11,12,13,15,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,47]},{"row":2,"cols":[2]},{"row":3,"cols":[3,5,7,8,9,10,12,13,15,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]},{"row":4,"cols":[4,5,7,8,9,10,12,13,15,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]},{"row":5,"cols":[5,40,41]},{"row":6,"cols":[6]},{"row":7,"cols":[7,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44]},{"row":8,"cols":[7,8,13,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44]},{"row":9,"cols":[9]},{"row":10,"cols":[9,10]},{"row":11,"cols":[9,10,11]},{"row":12,"cols":[5,7,8,9,10,12,13,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44]},{"row":13,"cols":[13]},{"row":14,"cols":[5,7,8,13,14,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44]},{"row":15,"cols":[5,7,8,9,10,12,13,15,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44]},{"row":16,"cols":[16,17,18,20,21]},{"row":17,"cols":[17,21]},{"row":18,"cols":[18]},{"row":19,"cols":[19]},{"row":20,"cols":[20]},{"row":21,"cols":[21]},{"row":22,"cols":[5,7,8,9,10,11,12,13,15,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44]},{"row":23,"cols":[23]},{"row":24,"cols":[24,40,41,43]},{"row":25,"cols":[25,40,41,43]},{"row":26,"cols":[26,40,41]},{"row":27,"cols":[23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44]},{"row":28,"cols":[28,33,35,40,41,43]},{"row":29,"cols":[29,32,36,40,41,43,44]},{"row":30,"cols":[30,32,37,40,41,43,44]},{"row":31,"cols":[31,33,38,40,41,43]},{"row":32,"cols":[32,40,41,43,44]},{"row":33,"cols":[33,40,41,43]},{"row":34,"cols":[23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44]},{"row":35,"cols":[33,35,40,41,43]},{"row":36,"cols":[32,36,40,41,43,44]},{"row":37,"cols":[32,37,40,41,43,44]},{"row":38,"cols":[33,38,40,41,43]},{"row":39,"cols":[23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44]},{"row":40,"cols":[40,41]},{"row":41,"cols":[41]},{"row":42,"cols":[42,43]},{"row":43,"cols":[43]},{"row":44,"cols":[43,44]},{"row":45,"cols":[5,7,8,9,10,12,13,15,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,47]},{"row":46,"cols":[5,7,8,9,10,12,13,15,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]},{"row":47,"cols":[5,7,8,9,10,12,13,15,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,47]}]';
 
                assert.strictEqual(JSON.stringify(result.visibilityList), testString);
             });
@@ -910,12 +934,12 @@ result.reports.forEach((report, index) =>
                result = undefined;
             });
 
-            test('reports are in correct order', () =>
+            test('modules are in correct order', () =>
             {
-               assert.strictEqual(result.reports[0].srcPath, '/a.js');
-               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
-               assert.strictEqual(result.reports[2].srcPath, '/a/c.js');
-               assert.strictEqual(result.reports[3].srcPath, '/d.js');
+               assert.strictEqual(result.modules[0].srcPath, '/a.js');
+               assert.strictEqual(result.modules[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.modules[2].srcPath, '/a/c.js');
+               assert.strictEqual(result.modules[3].srcPath, '/d.js');
             });
 
             test('adjacency list is correct', () =>
@@ -978,12 +1002,12 @@ result.reports.forEach((report, index) =>
                result = undefined;
             });
 
-            test('reports are in correct order', () =>
+            test('modules are in correct order', () =>
             {
-               assert.strictEqual(result.reports[0].srcPath, '/a.js');
-               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
-               assert.strictEqual(result.reports[2].srcPath, '/a/c.js');
-               assert.strictEqual(result.reports[3].srcPath, '/d.js');
+               assert.strictEqual(result.modules[0].srcPath, '/a.js');
+               assert.strictEqual(result.modules[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.modules[2].srcPath, '/a/c.js');
+               assert.strictEqual(result.modules[3].srcPath, '/d.js');
             });
 
             test('adjacency list is correct', () =>
@@ -1035,12 +1059,12 @@ result.reports.forEach((report, index) =>
                result = undefined;
             });
 
-            test('reports are in correct order', () =>
+            test('modules are in correct order', () =>
             {
-               assert.strictEqual(result.reports[0].srcPath, '/a.js');
-               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
-               assert.strictEqual(result.reports[2].srcPath, '/a/c.js');
-               assert.strictEqual(result.reports[3].srcPath, '/d.js');
+               assert.strictEqual(result.modules[0].srcPath, '/a.js');
+               assert.strictEqual(result.modules[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.modules[2].srcPath, '/a/c.js');
+               assert.strictEqual(result.modules[3].srcPath, '/d.js');
             });
 
             test('adjacency list is correct', () =>
@@ -1104,12 +1128,12 @@ result.reports.forEach((report, index) =>
                result = undefined;
             });
 
-            test('reports are in correct order', () =>
+            test('modules are in correct order', () =>
             {
-               assert.strictEqual(result.reports[0].srcPath, '/a.js');
-               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
-               assert.strictEqual(result.reports[2].srcPath, '/a/c.js');
-               assert.strictEqual(result.reports[3].srcPath, '/d.js');
+               assert.strictEqual(result.modules[0].srcPath, '/a.js');
+               assert.strictEqual(result.modules[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.modules[2].srcPath, '/a/c.js');
+               assert.strictEqual(result.modules[3].srcPath, '/d.js');
             });
 
             test('adjacency list is correct', () =>
@@ -1163,14 +1187,14 @@ result.reports.forEach((report, index) =>
                result = undefined;
             });
 
-            test('reports are in correct order', () =>
+            test('modules are in correct order', () =>
             {
-               assert.strictEqual(result.reports[0].srcPath, '/a.js');
-               assert.strictEqual(result.reports[1].srcPath, '/a/b.js');
-               assert.strictEqual(result.reports[2].srcPath, '/a/b/d.js');
-               assert.strictEqual(result.reports[3].srcPath, '/a/c.js');
-               assert.strictEqual(result.reports[4].srcPath, '/a/c/e.js');
-               assert.strictEqual(result.reports[5].srcPath, '/a/c/f.js');
+               assert.strictEqual(result.modules[0].srcPath, '/a.js');
+               assert.strictEqual(result.modules[1].srcPath, '/a/b.js');
+               assert.strictEqual(result.modules[2].srcPath, '/a/b/d.js');
+               assert.strictEqual(result.modules[3].srcPath, '/a/c.js');
+               assert.strictEqual(result.modules[4].srcPath, '/a/c/e.js');
+               assert.strictEqual(result.modules[5].srcPath, '/a/c/f.js');
             });
 
             test('adjacency list is correct', () =>
@@ -1208,13 +1232,13 @@ result.reports.forEach((report, index) =>
 
          suite('large project calculation performance', () =>
          {
-            const resultFixture = require('typhonjs-escomplex-test-data/files/large-project/results/results');
+            const resultFixture = require('typhonjs-escomplex-test-data/files/large-project/json/project-with-errors');
             const resultSkipCalc = escomplexProject.analyze(s_LOCAL_TEST_DATA, { skipCalculation: true });
 
             test('deserialize JSON object should be sufficiently fast', function()
             {
                this.timeout(100);
-               ProjectResult.parse(resultFixture);
+               ProjectReport.parse(resultFixture);
             });
 
             test('running calculations should be sufficiently fast', function()
@@ -1225,7 +1249,7 @@ result.reports.forEach((report, index) =>
 
             test('running analyze should be sufficiently fast', function()
             {
-               this.timeout(400);
+               this.timeout(450);
                escomplexProject.analyze(s_LOCAL_TEST_DATA);
             });
          });
