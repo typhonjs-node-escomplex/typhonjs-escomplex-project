@@ -1245,7 +1245,7 @@ result.modules.forEach((module, index) =>
 
             test('running analyze should be sufficiently fast', function()
             {
-               this.timeout(450);
+               this.timeout(650);
                escomplexProject.analyze(s_LOCAL_TEST_DATA);
             });
          });
