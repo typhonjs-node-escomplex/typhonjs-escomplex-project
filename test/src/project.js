@@ -1245,7 +1245,7 @@ result.modules.forEach((module, index) =>
 
             test('running analyze should be sufficiently fast', function()
             {
-               this.timeout(650);
+               this.timeout(800);  // Relatively high for slower CI configurations.
                escomplexProject.analyze(s_LOCAL_TEST_DATA);
             });
          });
