@@ -156,7 +156,7 @@ export default class ESComplexProject
 
       if (settings.skipCalculation) { return projectReport; }
 
-      this._plugins.onProjectEnd(this._pathModule, projectReport, settings);
+      this._plugins.onProjectEnd(projectReport, this._pathModule, settings);
 
       return projectReport.finalize();
    }
@@ -195,7 +195,7 @@ export default class ESComplexProject
       projectReport.settings = settings;
 
       this._plugins.onProjectStart(this._pathModule, settings);
-      this._plugins.onProjectEnd(this._pathModule, projectReport, settings);
+      this._plugins.onProjectEnd(projectReport, this._pathModule, settings);
 
       return projectReport.finalize();
    }

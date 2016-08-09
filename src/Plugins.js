@@ -76,15 +76,15 @@ export default class Plugins
     * Invokes the `onProjectEnd` plugin callback for all loaded plugins such they might finish calculating project
     * report metrics.
     *
-    * @param {object}         pathModule - Provides an object which matches the Node path module.
     * @param {ProjectReport}  projectReport - An instance of ProjectReport.
+    * @param {object}         pathModule - Provides an object which matches the Node path module.
     * @param {object}         settings - Settings for project processing.
     *
     * @returns {ProjectReport}
     */
-   onProjectEnd(pathModule, projectReport, settings)
+   onProjectEnd(projectReport, pathModule, settings)
    {
-      const event = this._pluginManager.invoke('onProjectEnd', { pathModule, projectReport, settings }, false);
+      const event = this._pluginManager.invoke('onProjectEnd', { projectReport, pathModule, settings }, false);
       return event !== null ? event.data.projectReport : projectReport;
    }
 }
