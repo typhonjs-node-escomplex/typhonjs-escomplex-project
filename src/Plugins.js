@@ -61,20 +61,39 @@ export default class Plugins
    }
 
    /**
-    * Initializes the default `report` object hash and then invokes the `onProjectStart` plugin callback for all loaded
-    * plugins.
+    * Invokes the `onProjectAverage` plugin callback for all loaded plugins such they might average any calculated
+    * results.
     *
-    * @param {object}   pathModule - Provides an object which matches the Node path module.
-    * @param {object}   settings - Settings for project processing.
+    * @param {ProjectReport}  projectReport - An instance of ProjectReport.
+    * @param {object}         pathModule - Provides an object which matches the Node path module.
+    * @param {object}         settings - Settings for project processing.
+    *
+    * @returns {ProjectReport}
     */
-   onProjectStart(pathModule, settings)
+   onProjectAverage(projectReport, pathModule, settings)
    {
-      this._pluginManager.invoke('onProjectStart', { pathModule, settings }, false);
+      const event = this._pluginManager.invoke('onProjectAverage', { projectReport, pathModule, settings }, false);
+      return event !== null ? event.data.projectReport : projectReport;
    }
 
    /**
-    * Invokes the `onProjectEnd` plugin callback for all loaded plugins such they might finish calculating project
-    * report metrics.
+    * Invokes the `onProjectCalculate` plugin callback for all loaded plugins such they might finish calculating
+    * results.
+    *
+    * @param {ProjectReport}  projectReport - An instance of ProjectReport.
+    * @param {object}         pathModule - Provides an object which matches the Node path module.
+    * @param {object}         settings - Settings for project processing.
+    *
+    * @returns {ProjectReport}
+    */
+   onProjectCalculate(projectReport, pathModule, settings)
+   {
+      const event = this._pluginManager.invoke('onProjectCalculate', { projectReport, pathModule, settings }, false);
+      return event !== null ? event.data.projectReport : projectReport;
+   }
+
+   /**
+    * Invokes the `onProjectEnd` plugin callback for all loaded plugins at the end of module processing.
     *
     * @param {ProjectReport}  projectReport - An instance of ProjectReport.
     * @param {object}         pathModule - Provides an object which matches the Node path module.
@@ -86,5 +105,33 @@ export default class Plugins
    {
       const event = this._pluginManager.invoke('onProjectEnd', { projectReport, pathModule, settings }, false);
       return event !== null ? event.data.projectReport : projectReport;
+   }
+
+   /**
+    * Invokes the `onProjectPostAverage` plugin callback for all loaded plugins such they might finish any calculations
+    * that involve averaged results.
+    *
+    * @param {ProjectReport}  projectReport - An instance of ProjectReport.
+    * @param {object}         pathModule - Provides an object which matches the Node path module.
+    * @param {object}         settings - Settings for project processing.
+    *
+    * @returns {ProjectReport}
+    */
+   onProjectPostAverage(projectReport, pathModule, settings)
+   {
+      const event = this._pluginManager.invoke('onProjectPostAverage', { projectReport, pathModule, settings }, false);
+      return event !== null ? event.data.projectReport : projectReport;
+   }
+
+   /**
+    * Initializes the default `report` object hash and then invokes the `onProjectStart` plugin callback for all loaded
+    * plugins.
+    *
+    * @param {object}   pathModule - Provides an object which matches the Node path module.
+    * @param {object}   settings - Settings for project processing.
+    */
+   onProjectStart(pathModule, settings)
+   {
+      this._pluginManager.invoke('onProjectStart', { pathModule, settings }, false);
    }
 }

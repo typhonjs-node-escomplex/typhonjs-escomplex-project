@@ -156,6 +156,16 @@ export default class ESComplexProject
 
       if (settings.skipCalculation) { return projectReport; }
 
+      // Allow all plugins to have a calculation pass at the project report.
+      this._plugins.onProjectCalculate(projectReport, this._pathModule, settings);
+
+      // Allow all plugins to have a pass at the project report to calculate any averaged data.
+      this._plugins.onProjectAverage(projectReport, this._pathModule, settings);
+
+      // Allow all plugins to have a pass at the project report to calculate any metrics that depend on averaged data.
+      this._plugins.onProjectPostAverage(projectReport, this._pathModule, settings);
+
+      // Allow all plugins to clean up any resources as necessary.
       this._plugins.onProjectEnd(projectReport, this._pathModule, settings);
 
       return projectReport.finalize();
@@ -195,6 +205,17 @@ export default class ESComplexProject
       projectReport.settings = settings;
 
       this._plugins.onProjectStart(this._pathModule, settings);
+
+      // Allow all plugins to have a calculation pass at the project report.
+      this._plugins.onProjectCalculate(projectReport, this._pathModule, settings);
+
+      // Allow all plugins to have a pass at the project report to calculate any averaged data.
+      this._plugins.onProjectAverage(projectReport, this._pathModule, settings);
+
+      // Allow all plugins to have a pass at the project report to calculate any metrics that depend on averaged data.
+      this._plugins.onProjectPostAverage(projectReport, this._pathModule, settings);
+
+      // Allow all plugins to clean up any resources as necessary.
       this._plugins.onProjectEnd(projectReport, this._pathModule, settings);
 
       return projectReport.finalize();
