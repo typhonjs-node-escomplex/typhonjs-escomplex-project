@@ -16,6 +16,7 @@ export const modules =
 export const parsers =
 {
    acorn: true,
+   babelParser: true,
    babylon: true,
    espree: true,
    esprima: true
