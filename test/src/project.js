@@ -253,7 +253,7 @@ if (testconfig.modules['project'])
 
             test('mean per-function parameter count is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.methodAverage.params, 0);
+               assert.strictEqual(result.moduleAverage.methodAverage.paramCount, 0);
             });
 
             test('mean per-function maintainability index is correct', () =>
@@ -556,22 +556,22 @@ if (testconfig.modules['project'])
 
             test('second module first method has correct parameter count', () =>
             {
-               assert.strictEqual(result.modules[1].methods[0].params, 2);
+               assert.strictEqual(result.modules[1].methods[0].paramCount, 2);
             });
 
             test('second module second method has correct parameter count', () =>
             {
-               assert.strictEqual(result.modules[1].methods[1].params, 2);
+               assert.strictEqual(result.modules[1].methods[1].paramCount, 2);
             });
 
             test('second module methodAggregate has correct parameter count', () =>
             {
-               assert.strictEqual(result.modules[1].methodAggregate.params, 4);
+               assert.strictEqual(result.modules[1].methodAggregate.paramCount, 4);
             });
 
             test('second module mean parameter count is correct', () =>
             {
-               assert.strictEqual(result.modules[1].methodAverage.params, 2);
+               assert.strictEqual(result.modules[1].methodAverage.paramCount, 2);
             });
 
             test('second module has correct srcPath', () =>
@@ -611,7 +611,7 @@ if (testconfig.modules['project'])
 
             test('mean per-function parameter count is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.methodAverage.params, 1);
+               assert.strictEqual(result.moduleAverage.methodAverage.paramCount, 1);
             });
 
             test('mean per-function maintainability index is correct', () =>
