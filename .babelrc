@@ -41,6 +41,8 @@
                   "escomplex-plugin-syntax-estree/src": "../escomplex-plugin-syntax-estree/src",
 
                   "typhonjs-escomplex-commons/src": "../typhonjs-escomplex-commons/src",
+
+                  "typhonjs-escomplex-module": "../typhonjs-escomplex-module/src",
                   "typhonjs-escomplex-module/src": "../typhonjs-escomplex-module/src"
                }
             }],
