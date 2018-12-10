@@ -399,27 +399,27 @@ if (testconfig.modules['project'])
 
             test('mean per-function logical LOC is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.methodAverage.sloc.logical, 4);
+               assert.strictEqual(result.moduleAverage.methodAverage.sloc.logical, 0);
             });
 
             test('mean per-function cyclomatic complexity is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.methodAverage.cyclomatic, 2);
+               assert.strictEqual(result.moduleAverage.methodAverage.cyclomatic, 0);
             });
 
             test('mean per-function Halstead effort is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.methodAverage.halstead.effort, 11.61);
+               assert.strictEqual(result.moduleAverage.methodAverage.halstead.effort, 0);
             });
 
             test('mean per-function parameter count is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.methodAverage.params, 0);
+               assert.strictEqual(result.moduleAverage.methodAverage.paramCount, 0);
             });
 
             test('mean per-function maintainability index is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.maintainability, 139.997);
+               assert.strictEqual(result.moduleAverage.maintainability, 139.464);
             });
          });
 
@@ -551,7 +551,7 @@ if (testconfig.modules['project'])
 
             test('second module maintainability index is correct', () =>
             {
-               assert.strictEqual(result.modules[1].maintainability, 128.115);
+               assert.strictEqual(result.modules[1].maintainability, 129.225);
             });
 
             test('second module first method has correct parameter count', () =>
@@ -596,17 +596,17 @@ if (testconfig.modules['project'])
 
             test('mean per-function logical LOC is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.methodAverage.sloc.logical, 4);
+               assert.strictEqual(result.moduleAverage.methodAverage.sloc.logical, 2);
             });
 
             test('mean per-function cyclomatic complexity is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.methodAverage.cyclomatic, 2);
+               assert.strictEqual(result.moduleAverage.methodAverage.cyclomatic, 1);
             });
 
             test('mean per-function Halstead effort is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.methodAverage.halstead.effort, 193.162);
+               assert.strictEqual(result.moduleAverage.methodAverage.halstead.effort, 141.804);
             });
 
             test('mean per-function parameter count is correct', () =>
@@ -616,7 +616,7 @@ if (testconfig.modules['project'])
 
             test('mean per-function maintainability index is correct', () =>
             {
-               assert.strictEqual(result.moduleAverage.maintainability, 134.056);
+               assert.strictEqual(result.moduleAverage.maintainability, 134.344);
             });
          });
 
