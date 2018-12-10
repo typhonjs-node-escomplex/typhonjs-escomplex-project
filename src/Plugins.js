@@ -32,7 +32,7 @@ export default class Plugins
       if (typeof options.loadDefaultPlugins === 'boolean' && !options.loadDefaultPlugins) { /* nop */ }
       else
       {
-         this._pluginManager.addPlugin(new PluginMetricsProject());
+         this._pluginManager.add({ name: 'escomplex-plugin-metrics-project', instance: new PluginMetricsProject() });
       }
    }
 
@@ -56,8 +56,8 @@ export default class Plugins
          skipCalculation: typeof options.skipCalculation === 'boolean' ? options.skipCalculation : false
       };
 
-      const event = this._pluginManager.invoke('onConfigure', { options, settings }, true);
-      return event !== null ? event.data.settings : settings;
+      const event = this._pluginManager.invokeSyncEvent('onConfigure', { options, settings });
+      return event !== null ? event.settings : settings;
    }
 
    /**
@@ -72,8 +72,10 @@ export default class Plugins
     */
    onProjectAverage(projectReport, pathModule, settings)
    {
-      const event = this._pluginManager.invoke('onProjectAverage', { projectReport, pathModule, settings }, false);
-      return event !== null ? event.data.projectReport : projectReport;
+      const event = this._pluginManager.invokeSyncEvent('onProjectAverage', void 0,
+       { projectReport, pathModule, settings });
+
+      return event !== null ? event.projectReport : projectReport;
    }
 
    /**
@@ -88,8 +90,10 @@ export default class Plugins
     */
    onProjectCalculate(projectReport, pathModule, settings)
    {
-      const event = this._pluginManager.invoke('onProjectCalculate', { projectReport, pathModule, settings }, false);
-      return event !== null ? event.data.projectReport : projectReport;
+      const event = this._pluginManager.invokeSyncEvent('onProjectCalculate', void 0,
+       { projectReport, pathModule, settings });
+
+      return event !== null ? event.projectReport : projectReport;
    }
 
    /**
@@ -103,8 +107,10 @@ export default class Plugins
     */
    onProjectEnd(projectReport, pathModule, settings)
    {
-      const event = this._pluginManager.invoke('onProjectEnd', { projectReport, pathModule, settings }, false);
-      return event !== null ? event.data.projectReport : projectReport;
+      const event = this._pluginManager.invokeSyncEvent('onProjectEnd', void 0,
+       { projectReport, pathModule, settings });
+
+      return event !== null ? event.projectReport : projectReport;
    }
 
    /**
@@ -119,8 +125,10 @@ export default class Plugins
     */
    onProjectPostAverage(projectReport, pathModule, settings)
    {
-      const event = this._pluginManager.invoke('onProjectPostAverage', { projectReport, pathModule, settings }, false);
-      return event !== null ? event.data.projectReport : projectReport;
+      const event = this._pluginManager.invokeSyncEvent('onProjectPostAverage', void 0,
+       { projectReport, pathModule, settings });
+
+      return event !== null ? event.projectReport : projectReport;
    }
 
    /**
@@ -132,6 +140,6 @@ export default class Plugins
     */
    onProjectStart(pathModule, settings)
    {
-      this._pluginManager.invoke('onProjectStart', { pathModule, settings }, false);
+      this._pluginManager.invokeSyncEvent('onProjectStart', void 0, { pathModule, settings });
    }
 }
