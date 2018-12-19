@@ -71,7 +71,7 @@ if (testconfig.parsers.babelParser)
       name: 'babelParser',
       parse: function(code, options, overrides)
       {
-         const ast = BabelParser.parseSource(code, options, overrides);
+         const ast = BabelParser.parse(code, options, overrides);
          log(`!! (babelParser): parse - ast: ${JSON.stringify(ast)}`);
          return ast;
       }
