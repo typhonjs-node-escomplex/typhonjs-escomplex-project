@@ -5,7 +5,8 @@
  */
 export const modules =
 {
-   project: true
+   project: true,
+   temptest: false
 };
 
 /**
