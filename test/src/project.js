@@ -9,18 +9,10 @@ import ProjectReport    from 'typhonjs-escomplex-commons/src/project/report/Proj
 
 import escomplexProject from '../../src';
 
-// TODO REMOVE
-// import escomplexModule from 'typhonjs-escomplex-module';
-
 if (testconfig.modules['project'])
 {
    parsers.forEach((Parser) =>
    {
-      // TODO REMOVE
-      // const s_AST = Parser.parse(fs.readFileSync('./node_modules/typhonjs-escomplex-test-data/files/large-module/src/Collection.js', 'utf8'));
-      // const moduleReport = escomplexModule.analyze(s_AST);
-      // fs.writeFileSync(process.cwd() + '/test/fixture/module.json', moduleReport.toFormat('json', { spacing: 3 }), 'utf8');
-
       /**
        * Load project source and local test files from NPM module typhonjs-escomplex-commons and
        * typhonjs-escomplex-module. The order is purposely out of order to test sorting of `srcPath`.
@@ -97,8 +89,11 @@ if (testconfig.modules['project'])
             srcPathAlias = 'typhonjs-escomplex-module';
          }
 
+         // Load the project data from the test module / files.
+         const testDataFilePath = filePath.replace(/^\.\//, './node_modules/typhonjs-escomplex-test-data/project/');
+
          return {
-            ast: Parser.parse(fs.readFileSync(filePath, 'utf8')),
+            ast: Parser.parse(fs.readFileSync(testDataFilePath, 'utf8')),
             filePath,
             srcPath,
             srcPathAlias
@@ -1233,19 +1228,19 @@ result.modules.forEach((module, index) =>
 
             test('deserialize JSON object should be sufficiently fast', function()
             {
-               this.timeout(100);
+               this.timeout(200);
                ProjectReport.parse(resultFixture);
             });
 
             test('running calculations should be sufficiently fast', function()
             {
-               this.timeout(150);
+               this.timeout(300);
                escomplexProject.process(resultSkipCalc);
             });
 
             test('running analyze should be sufficiently fast', function()
             {
-               this.timeout(800);  // Relatively high for slower CI configurations.
+               this.timeout(1400);  // Relatively high for slower CI configurations.
                escomplexProject.analyze(s_LOCAL_TEST_DATA);
             });
          });
