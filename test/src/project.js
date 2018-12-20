@@ -281,24 +281,24 @@ if (testconfig.modules['project'])
                assert.lengthOf(result.modules, 1);
             });
 
-            test('first module methodAggregate has correct physical lines of code', () =>
+            test('first module aggregate has correct physical lines of code', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.sloc.physical, 1);
+               assert.strictEqual(result.modules[0].aggregate.sloc.physical, 1);
             });
 
-            test('first module methodAggregate has correct logical lines of code', () =>
+            test('first module aggregate has correct logical lines of code', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.sloc.logical, 4);
+               assert.strictEqual(result.modules[0].aggregate.sloc.logical, 4);
             });
 
-            test('first module methodAggregate has correct cyclomatic complexity', () =>
+            test('first module aggregate has correct cyclomatic complexity', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.cyclomatic, 2);
+               assert.strictEqual(result.modules[0].aggregate.cyclomatic, 2);
             });
 
-            test('first module methodAggregate has correct cyclomatic complexity density', () =>
+            test('first module aggregate has correct cyclomatic complexity density', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.cyclomaticDensity, 50);
+               assert.strictEqual(result.modules[0].aggregate.cyclomaticDensity, 50);
             });
 
             test('first module methods is empty', () =>
@@ -306,75 +306,75 @@ if (testconfig.modules['project'])
                assert.lengthOf(result.modules[0].methods, 0);
             });
 
-            test('first module methodAggregate has correct Halstead total operators', () =>
+            test('first module aggregate has correct Halstead total operators', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.operators.total, 2);
+               assert.strictEqual(result.modules[0].aggregate.halstead.operators.total, 2);
             });
 
-            test('first module methodAggregate has correct Halstead distinct operators', () =>
+            test('first module aggregate has correct Halstead distinct operators', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.operators.distinct, 2);
+               assert.strictEqual(result.modules[0].aggregate.halstead.operators.distinct, 2);
             });
 
-            test('first module methodAggregate has correct Halstead total operands', () =>
+            test('first module aggregate has correct Halstead total operands', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.operands.total, 3);
+               assert.strictEqual(result.modules[0].aggregate.halstead.operands.total, 3);
             });
 
-            test('first module methodAggregate has correct Halstead distinct operands', () =>
+            test('first module aggregate has correct Halstead distinct operands', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.operands.distinct, 3);
+               assert.strictEqual(result.modules[0].aggregate.halstead.operands.distinct, 3);
             });
 
-            test('first module methodAggregate has correct Halstead operator identifier length', () =>
+            test('first module aggregate has correct Halstead operator identifier length', () =>
             {
                assert.lengthOf(
-                  result.modules[0].methodAggregate.halstead.operators.identifiers,
-                  result.modules[0].methodAggregate.halstead.operators.distinct
+                  result.modules[0].aggregate.halstead.operators.identifiers,
+                  result.modules[0].aggregate.halstead.operators.distinct
                );
             });
 
-            test('first module methodAggregate has correct Halstead operand identifier length', () =>
+            test('first module aggregate has correct Halstead operand identifier length', () =>
             {
                assert.lengthOf(
-                  result.modules[0].methodAggregate.halstead.operands.identifiers,
-                  result.modules[0].methodAggregate.halstead.operands.distinct
+                  result.modules[0].aggregate.halstead.operands.identifiers,
+                  result.modules[0].aggregate.halstead.operands.distinct
                );
             });
 
-            test('first module methodAggregate has correct Halstead length', () =>
+            test('first module aggregate has correct Halstead length', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.length, 5);
+               assert.strictEqual(result.modules[0].aggregate.halstead.length, 5);
             });
 
-            test('first module methodAggregate has correct Halstead vocabulary', () =>
+            test('first module aggregate has correct Halstead vocabulary', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.vocabulary, 5);
+               assert.strictEqual(result.modules[0].aggregate.halstead.vocabulary, 5);
             });
 
-            test('first module methodAggregate has correct Halstead difficulty', () =>
+            test('first module aggregate has correct Halstead difficulty', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.difficulty, 1);
+               assert.strictEqual(result.modules[0].aggregate.halstead.difficulty, 1);
             });
 
-            test('first module methodAggregate has correct Halstead volume', () =>
+            test('first module aggregate has correct Halstead volume', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.volume, 11.61);
+               assert.strictEqual(result.modules[0].aggregate.halstead.volume, 11.61);
             });
 
-            test('first module methodAggregate has correct Halstead effort', () =>
+            test('first module aggregate has correct Halstead effort', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.effort, 11.61);
+               assert.strictEqual(result.modules[0].aggregate.halstead.effort, 11.61);
             });
 
-            test('first module methodAggregate has correct Halstead bugs', () =>
+            test('first module aggregate has correct Halstead bugs', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.bugs, 0.004);
+               assert.strictEqual(result.modules[0].aggregate.halstead.bugs, 0.004);
             });
 
-            test('first module methodAggregate has correct Halstead time', () =>
+            test('first module aggregate has correct Halstead time', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.time, 0.645);
+               assert.strictEqual(result.modules[0].aggregate.halstead.time, 0.645);
             });
 
             test('first module has correct srcPath', () =>
@@ -448,24 +448,24 @@ if (testconfig.modules['project'])
                assert.lengthOf(result.modules, 2);
             });
 
-            test('first module methodAggregate has correct physical lines of code', () =>
+            test('first module aggregate has correct physical lines of code', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.sloc.physical, 1);
+               assert.strictEqual(result.modules[0].aggregate.sloc.physical, 1);
             });
 
-            test('first module methodAggregate has correct logical lines of code', () =>
+            test('first module aggregate has correct logical lines of code', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.sloc.logical, 4);
+               assert.strictEqual(result.modules[0].aggregate.sloc.logical, 4);
             });
 
-            test('first module methodAggregate has correct cyclomatic complexity', () =>
+            test('first module aggregate has correct cyclomatic complexity', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.cyclomatic, 2);
+               assert.strictEqual(result.modules[0].aggregate.cyclomatic, 2);
             });
 
-            test('first module methodAggregate has correct cyclomatic complexity density', () =>
+            test('first module aggregate has correct cyclomatic complexity density', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.cyclomaticDensity, 50);
+               assert.strictEqual(result.modules[0].aggregate.cyclomaticDensity, 50);
             });
 
             test('first module methods is empty', () =>
@@ -473,75 +473,75 @@ if (testconfig.modules['project'])
                assert.lengthOf(result.modules[0].methods, 0);
             });
 
-            test('first module methodAggregate has correct Halstead total operators', () =>
+            test('first module aggregate has correct Halstead total operators', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.operators.total, 2);
+               assert.strictEqual(result.modules[0].aggregate.halstead.operators.total, 2);
             });
 
-            test('first module methodAggregate has correct Halstead distinct operators', () =>
+            test('first module aggregate has correct Halstead distinct operators', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.operators.distinct, 2);
+               assert.strictEqual(result.modules[0].aggregate.halstead.operators.distinct, 2);
             });
 
-            test('first module methodAggregate has correct Halstead total operands', () =>
+            test('first module aggregate has correct Halstead total operands', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.operands.total, 3);
+               assert.strictEqual(result.modules[0].aggregate.halstead.operands.total, 3);
             });
 
-            test('first module methodAggregate has correct Halstead distinct operands', () =>
+            test('first module aggregate has correct Halstead distinct operands', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.operands.distinct, 3);
+               assert.strictEqual(result.modules[0].aggregate.halstead.operands.distinct, 3);
             });
 
-            test('first module methodAggregate has correct Halstead operator identifier length', () =>
+            test('first module aggregate has correct Halstead operator identifier length', () =>
             {
                assert.lengthOf(
-                  result.modules[0].methodAggregate.halstead.operators.identifiers,
-                  result.modules[0].methodAggregate.halstead.operators.distinct
+                  result.modules[0].aggregate.halstead.operators.identifiers,
+                  result.modules[0].aggregate.halstead.operators.distinct
                );
             });
 
-            test('first module methodAggregate has correct Halstead operand identifier length', () =>
+            test('first module aggregate has correct Halstead operand identifier length', () =>
             {
                assert.lengthOf(
-                  result.modules[0].methodAggregate.halstead.operands.identifiers,
-                  result.modules[0].methodAggregate.halstead.operands.distinct
+                  result.modules[0].aggregate.halstead.operands.identifiers,
+                  result.modules[0].aggregate.halstead.operands.distinct
                );
             });
 
-            test('first module methodAggregate has correct Halstead length', () =>
+            test('first module aggregate has correct Halstead length', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.length, 5);
+               assert.strictEqual(result.modules[0].aggregate.halstead.length, 5);
             });
 
-            test('first module methodAggregate has correct Halstead vocabulary', () =>
+            test('first module aggregate has correct Halstead vocabulary', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.vocabulary, 5);
+               assert.strictEqual(result.modules[0].aggregate.halstead.vocabulary, 5);
             });
 
-            test('first module methodAggregate has correct Halstead difficulty', () =>
+            test('first module aggregate has correct Halstead difficulty', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.difficulty, 1);
+               assert.strictEqual(result.modules[0].aggregate.halstead.difficulty, 1);
             });
 
-            test('first module methodAggregate has correct Halstead volume', () =>
+            test('first module aggregate has correct Halstead volume', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.volume, 11.61);
+               assert.strictEqual(result.modules[0].aggregate.halstead.volume, 11.61);
             });
 
-            test('first module methodAggregate has correct Halstead effort', () =>
+            test('first module aggregate has correct Halstead effort', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.effort, 11.61);
+               assert.strictEqual(result.modules[0].aggregate.halstead.effort, 11.61);
             });
 
-            test('first module methodAggregate has correct Halstead bugs', () =>
+            test('first module aggregate has correct Halstead bugs', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.bugs, 0.004);
+               assert.strictEqual(result.modules[0].aggregate.halstead.bugs, 0.004);
             });
 
-            test('first module methodAggregate has correct Halstead time', () =>
+            test('first module aggregate has correct Halstead time', () =>
             {
-               assert.strictEqual(result.modules[0].methodAggregate.halstead.time, 0.645);
+               assert.strictEqual(result.modules[0].aggregate.halstead.time, 0.645);
             });
 
             test('first module has correct srcPath', () =>
@@ -564,9 +564,9 @@ if (testconfig.modules['project'])
                assert.strictEqual(result.modules[1].methods[1].paramCount, 2);
             });
 
-            test('second module methodAggregate has correct parameter count', () =>
+            test('second module aggregate has correct parameter count', () =>
             {
-               assert.strictEqual(result.modules[1].methodAggregate.paramCount, 4);
+               assert.strictEqual(result.modules[1].aggregate.paramCount, 4);
             });
 
             test('second module mean parameter count is correct', () =>
