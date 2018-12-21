@@ -8,14 +8,14 @@
 
 [![Build Status](https://travis-ci.org/typhonjs-node-escomplex/typhonjs-escomplex-project.svg?branch=master)](https://travis-ci.org/typhonjs-node-escomplex/typhonjs-escomplex-project)
 [![Coverage](https://img.shields.io/codecov/c/github/typhonjs-node-escomplex/typhonjs-escomplex-project.svg)](https://codecov.io/github/typhonjs-node-escomplex/typhonjs-escomplex-project)
-[![Dependency Status](https://www.versioneye.com/user/projects/575de44d7757a00041b3b906/badge.svg?style=flat)](https://www.versioneye.com/user/projects/575de44d7757a00041b3b906)
+[![Dependency Status](https://david-dm.org/typhonjs-node-escomplex/typhonjs-escomplex-project/status.svg)](https://david-dm.org/typhonjs-node-escomplex/typhonjs-escomplex-project)
 
-Provides project oriented AST processing for typhonjs-escomplex complexity reports. The following JS AST generators are supported / tested: [acorn](https://www.npmjs.com/package/acorn), [babylon](https://www.npmjs.com/package/babylon), [espree](https://www.npmjs.com/package/espree), [esprima](https://www.npmjs.com/package/esprima). Any compliant JS parser that supports Babylon or ESTree AST should work as well.
+Provides project oriented AST processing for typhonjs-escomplex complexity reports. The following JS AST generators are supported / tested: [acorn](https://www.npmjs.com/package/acorn), [babel parser](https://www.npmjs.com/package/@babel/parser), [babylon](https://www.npmjs.com/package/babylon), [espree](https://www.npmjs.com/package/espree), [esprima](https://www.npmjs.com/package/esprima). Any compliant JS parser that supports Babylon or ESTree AST should work as well.
 
 More information forthcoming. This NPM module can be installed as a dependency in `package.json` as follows:
 ```
 "dependencies": {
-  "typhonjs-escomplex-project": "^0.0.9"
+  "typhonjs-escomplex-project": "^0.1.0"
 }
 ```
 
